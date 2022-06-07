@@ -21,14 +21,6 @@ services:
     depends_on:
       - postgres
       - minio
-  # metastore-init:
-  #   build: ./metastore
-  #   command: ["bin/schematool", "-initSchema", "-dbType", "postgres"]
-  #   volumes:
-  #     - hive-data:/user/hive/warehouse
-  #   depends_on:
-  #     - postgres
-  #     - minio
   minio:
     image: quay.io/minio/minio
     command: ["server", "/data", "--console-address", ":9090"]
@@ -40,12 +32,13 @@ services:
     ports:
       - 9090:9090
       - 9000:9000
-  createbuckets:
+  minio-init:
     image: minio/mc # MinioClient image; use it to make buckets and perform any other tasks on startup
     depends_on:
       - minio
     entrypoint: >
       /bin/sh -c "
+      sleep 3;
       /usr/bin/mc alias set myminio http://minio:9000 minio minio123;
       /usr/bin/mc mb myminio/test;
       /usr/bin/mc policy set public myminio/test;

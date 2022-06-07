@@ -24,8 +24,9 @@ CREATE TABLE IF NOT EXISTS filehive.taxi.trips(
         total_amount DOUBLE 
         )  
         WITH ( 
-            external_location = 's3a://test/',  
+            external_location = 's3a://test/taxi',  
             format = 'PARQUET'        
         ); 
+SELECT * FROM filehive.taxi.trips LIMIT 10;
 -- DROP TABLE filehive.taxi.trips;
 -- DROP SCHEMA filehive.taxi;
