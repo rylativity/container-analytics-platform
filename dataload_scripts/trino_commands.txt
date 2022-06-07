@@ -1,0 +1,31 @@
+CREATE SCHEMA IF NOT EXISTS filehive.taxi;
+
+CREATE TABLE IF NOT EXISTS filehive.taxi.trips( 
+        VendorID BIGINT, 
+        tpep_pickup_datetime TIMESTAMP, 
+        tpep_dropoff_datetime TIMESTAMP, 
+        passenger_count DOUBLE, 
+        trip_distance DOUBLE, 
+        PULocationID BIGINT,
+        DOLocationID BIGINT,
+        RatecodeID DOUBLE, 
+        store_and_fwd_flag VARCHAR, 
+        dropoff_longitude DOUBLE, 
+        dropoff_latitude DOUBLE,  
+        payment_type BIGINT,  
+        fare_amount DOUBLE,  
+        improvement_surcharge DOUBLE, 
+        congestion_surcharge DOUBLE, 
+        mta_tax DOUBLE,  
+        tip_amount DOUBLE,  
+        tolls_amount DOUBLE, 
+        extra DOUBLE, 
+        airport_fee DOUBLE,
+        total_amount DOUBLE 
+        )  
+        WITH ( 
+            external_location = 's3a://test/',  
+            format = 'PARQUET'        
+        ); 
+-- DROP TABLE filehive.taxi.trips;
+-- DROP SCHEMA filehive.taxi;

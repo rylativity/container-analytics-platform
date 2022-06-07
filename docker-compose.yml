@@ -1,0 +1,66 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=hive
+      - POSTGRES_PASSWORD=hive
+      - POSTGRES_DB=metadata
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready","-U", "hive", "metadata"]
+    restart: always
+  metastore:
+    build: ./metastore
+    volumes:
+      - hive-data:/opt/warehouse # /user/hive/warehouse is where hive standalone metastore keeps data
+    ports:
+      - 9083:9083 #Thrift port
+    depends_on:
+      - postgres
+      - minio
+  # metastore-init:
+  #   build: ./metastore
+  #   command: ["bin/schematool", "-initSchema", "-dbType", "postgres"]
+  #   volumes:
+  #     - hive-data:/user/hive/warehouse
+  #   depends_on:
+  #     - postgres
+  #     - minio
+  minio:
+    image: quay.io/minio/minio
+    command: ["server", "/data", "--console-address", ":9090"]
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio123
+    volumes:
+      - minio-data:/data
+    ports:
+      - 9090:9090
+      - 9000:9000
+  createbuckets:
+    image: minio/mc # MinioClient image; use it to make buckets and perform any other tasks on startup
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 minio minio123;
+      /usr/bin/mc mb myminio/test;
+      /usr/bin/mc policy set public myminio/test;
+      /usr/bin/mc admin user svcacct add --access-key 'trinohiveaccesskey' --secret-key 'trinohivesupersecretkey' myminio minio;
+      exit 0;
+      "
+  trino:
+    build:
+      context: ./trino
+    ports:
+      - 8080:8080
+  aws:
+    image: amazon/aws-cli
+
+volumes:
+  postgres-db:
+  hive-data:
+  minio-data:
