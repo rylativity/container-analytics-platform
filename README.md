@@ -5,15 +5,16 @@ This project contains all files needed to set up and test a Hive Standalone Meta
 ## Setup
 - Run `docker-compose up -d` (This will bring up the containers, initalize the metastore postgres database, create a 'test' bucket with public permissions in Minio, and create a Minio service account access-key/secret)
 - Once the containers are running and the initialization is complete, run `./dataload_scripts/load_taxidata_to_minio.sh` (This will download NYC Taxi Data from the year 2022 and store in in the public 'test' bucket in Minio)
-- Once the taxi data is available in Minio, you can exec into the Trino container to create the Hive schemas and tables.  Run `docker-compose exec trino trino` to open the Trino shell in the Trino container.  See ./dataload_scripts/trino_commands.txt for examples of how to create Hive schemas and tables. Alternatively, if you are using the NYC Taxi example data, you can run `./load_taxidata_to_minio.sh`, which will pass the commands in trino_commands.txt to the Trino shell in the Trino container for execution.
+- Once the taxi data is available in Minio, you can exec into the Trino container to create the Hive schemas and tables.  Run `docker-compose exec trino trino` to open the Trino shell in the Trino container.  See ./dataload_scripts/trino_commands.txt for examples of how to create Hive schemas and tables. Alternatively, if you are using the NYC Taxi example data, you can run `./dataload_scripts/register_trino_hive_tables.sh`, which will pass the commands in trino_commands.txt to the Trino shell in the Trino container for execution.
+- The trino service is configured to use 2GB of RAM maximum.  If you want Trino to use more or less memory, modify the "-Xmx" value in trino/conf/jvm.config.
 
-Minio UI - http://localhost:9090
+Minio UI - http://localhost:9090 (user: minio, password: minio123)
 
-Trino UI - http://localhost:8080
+Trino UI - http://localhost:8080 (user: *any*)
 
 Trino Shell - `docker-compose exec trino trino` (Use this to run SQL commands against data in Minio)
 
-Superset UI - TODO
+Superset UI - http://localhost:8088 (user: admin, password: admin)
 
 ***
 

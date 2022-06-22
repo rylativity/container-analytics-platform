@@ -8,7 +8,10 @@ SHELL ["/bin/bash","-c"]
 ARG TRINO_SERVER_VERSION=386
 
 RUN set -euxo pipefail && \
-    apt-get update && apt-get install -y python3 python3-dev python3-pip curl less && \
+     apt-get update && \
+      apt-get install -y \
+        python3 python3-dev python3-pip \
+        curl less &&\
     ln -s /usr/bin/python3 /usr/bin/python &&\
     echo "trino soft nofile 131072 \ntrino hard nofile 131072\n" >> /etc/security/limits.conf &&\
     pip3 install sqlalchemy-trino && \
