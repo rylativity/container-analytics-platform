@@ -41,10 +41,10 @@ Once you have sample data in Minio, you can register schemas and tables in Hive 
 ## Roadmap
 - [x] Initalize Minio (by creating bucket and adding taxi Parquet data - https://registry.opendata.aws/nyc-tlc-trip-records-pds/) 
 - [x] Initialize Trino (by creating a hive table from Parquet taxi data in Minio)
-- [ ] Resolve bug in Standalone Metastore (NoSuchObjectException 'hive.<schema>.<table>' no such table) when attempting to create hive table
+- [x] Resolve bug in Standalone Metastore (NoSuchObjectException 'hive.<schema>.<table>' no such table) when attempting to create hive table
 - [ ] Update README.md with explanation of services
 - [ ] Update README.md with instructions for using example data & init scripts
-- [ ] Add Superset to Project for Data Exploration
+- [x] Add Superset to Project for Data Exploration
 
 ## Tips & Troubleshooting
  - Stick with bucketnames that use only lowercase letters and no special characters.  
