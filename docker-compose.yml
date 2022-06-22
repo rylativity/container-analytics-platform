@@ -1,5 +1,14 @@
 version: '3.9'
 
+x-superset-image: &superset-image apache/superset:latest
+x-superset-depends-on: &superset-depends-on
+  - postgres
+  - redis
+x-superset-volumes: &superset-volumes
+  # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
+  - ./superset/docker:/app/docker
+  - superset_home:/app/superset_home
+
 services:
   postgres:
     image: postgres:latest
@@ -9,13 +18,14 @@ services:
       - POSTGRES_DB=metadata
     volumes:
       - postgres-db:/var/lib/postgresql/data
+      - ./superset/init_supersetdb.sql:/docker-entrypoint-initdb.d/init_supersetdb.sql
     healthcheck:
       test: ["CMD", "pg_isready","-U", "hive", "metadata"]
     restart: always
   metastore:
     build: ./metastore
-    volumes:
-      - hive-data:/opt/warehouse # /user/hive/warehouse is where hive standalone metastore keeps data
+    # volumes:
+    #   - hive-data:/opt/warehouse # /user/hive/warehouse is where hive standalone metastore keeps data
     ports:
       - 9083:9083 #Thrift port
     depends_on:
@@ -53,7 +63,48 @@ services:
   aws:
     image: amazon/aws-cli
 
+  superset:
+    env_file: superset/docker/.env-non-dev
+    image: *superset-image
+    command: ["/app/docker/docker-bootstrap.sh", "app-gunicorn"]
+    user: "root"
+    restart: unless-stopped
+    ports:
+      - 8088:8088
+    depends_on: *superset-depends-on
+    volumes: *superset-volumes
+  superset-init:
+    image: *superset-image
+    command: ["/app/docker/docker-init.sh"]
+    env_file: superset/docker/.env-non-dev
+    depends_on: *superset-depends-on
+    user: "root"
+    volumes: *superset-volumes
+  superset-worker:
+    image: *superset-image
+    command: ["/app/docker/docker-bootstrap.sh", "worker"]
+    env_file: superset/docker/.env-non-dev
+    restart: unless-stopped
+    depends_on: *superset-depends-on
+    user: "root"
+    volumes: *superset-volumes
+  superset-worker-beat:
+    image: *superset-image
+    command: ["/app/docker/docker-bootstrap.sh", "beat"]
+    env_file: superset/docker/.env-non-dev
+    restart: unless-stopped
+    depends_on: *superset-depends-on
+    user: "root"
+    volumes: *superset-volumes
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    volumes:
+      - redis:/data
+
 volumes:
   postgres-db:
   hive-data:
   minio-data:
+  superset_home:
+  redis:
