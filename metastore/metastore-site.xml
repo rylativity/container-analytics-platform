@@ -17,18 +17,18 @@
         <name>fs.s3a.connection.ssl.enabled</name>
         <value>false</value>
     </property>
-    <!-- <property>
+    <property>
         <name>fs.s3a.path.style.access</name>
         <value>true</value>
-    </property> -->
+    </property>
     <property>
         <name>fs.s3a.endpoint</name>
         <value>http://minio:9000</value>
     </property>
-    <!-- <property>
+    <property>
         <name>fs.s3a.impl</name>
         <value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
-    </property> -->
+    </property>
     <property>
         <name>javax.jdo.option.ConnectionURL</name>
         <value>jdbc:postgresql://postgres:5432/metadata</value>
@@ -51,7 +51,7 @@
     </property>
     <property>
         <name>metastore.thrift.uris</name>
-        <value>thrift://0.0.0.0:9083</value>
+        <value>thrift://metastore:9083</value>
         <description>Thrift URI for the remote metastore. Used by metastore client to connect to remote metastore.</description>
     </property>
     <property>

@@ -1,6 +1,6 @@
-CREATE SCHEMA IF NOT EXISTS filehive.taxi;
+CREATE SCHEMA IF NOT EXISTS hive.taxi;
 
-CREATE TABLE IF NOT EXISTS filehive.taxi.trips( 
+CREATE TABLE IF NOT EXISTS hive.taxi.trips( 
         VendorID BIGINT, 
         tpep_pickup_datetime TIMESTAMP, 
         tpep_dropoff_datetime TIMESTAMP, 
@@ -27,6 +27,6 @@ CREATE TABLE IF NOT EXISTS filehive.taxi.trips(
             external_location = 's3a://test/taxi',  
             format = 'PARQUET'        
         ); 
-SELECT * FROM filehive.taxi.trips LIMIT 10;
--- DROP TABLE filehive.taxi.trips;
--- DROP SCHEMA filehive.taxi;
+SELECT * FROM hive.taxi.trips LIMIT 10;
+-- DROP TABLE hive.taxi.trips;
+-- DROP SCHEMA hive.taxi;
