@@ -45,6 +45,8 @@ Once you have sample data in Minio, you can register schemas and tables in Hive 
 - [ ] Update README.md with explanation of services
 - [ ] Update README.md with instructions for using example data & init scripts
 - [x] Add Superset to Project for Data Exploration
+- [ ] Add pyhive example query
+- [ ] Add Spark
 
 ## Tips & Troubleshooting
  - Stick with bucketnames that use only lowercase letters and no special characters.  
