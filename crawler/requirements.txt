@@ -1,2 +1,4 @@
 boto3
 pyhive
+pandas
+pyarrow

@@ -1,7 +1,9 @@
+from io import BytesIO
 import os
 
 import boto3
 import pyhive
+import pyarrow.parquet as pq
 
 import logging
 
@@ -38,13 +40,27 @@ class Crawler:
         for page in page_iterator:
             contents = page["Contents"]
             keys = [obj["Key"] for obj in contents]
-            all_keys.append(keys)
+            all_keys.extend(keys)
             prefixes = ["/".join(k.split("/")[:-1]) for k in keys]
             all_prefixes.extend(prefixes)
-        
         all_prefixes = list(set(all_prefixes))
-        print(all_keys)
-        print(all_prefixes)
+        
+        print("Found Keys:", all_keys)
+        print("Found Prefixes:", all_prefixes)
+
+        pq_files = [k for k in all_keys if k.endswith((".parq",".parquet"))]        
+        pq_schemas = []
+        for f in pq_files:
+            content = BytesIO(self.s3_client.get_object(Bucket=bucket, Key=f)["Body"].read())
+            schema = pq.read_schema(content)
+            pq_schemas.append(dict(zip(schema.names, schema.types)))
+
+        print("Found Parquet Files... \n")
+        for i in range(len(pq_files)):
+            print("File:", pq_files[i])
+            print("Schema:", pq_schemas[i], "\n")
+        
+        
             
 
 if __name__ == "__main__":
