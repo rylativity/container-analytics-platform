@@ -53,8 +53,19 @@ services:
       /usr/bin/mc mb myminio/test;
       /usr/bin/mc policy set public myminio/test;
       /usr/bin/mc admin user svcacct add --access-key 'trinohiveaccesskey' --secret-key 'trinohivesupersecretkey' myminio minio;
+      /usr/bin/mc admin user svcacct add --access-key 'crawleraccesskey' --secret-key 'crawlersupersecretkey' myminio minio;
       exit 0;
       "
+  minio-crawler:
+    build: 
+      context: ./crawler
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - DEBUG=1
+      - CRAWLER_S3_BUCKET=test
+      - CRAWLER_S3_ACCESS_KEY=crawleraccesskey
+      - CRAWLER_S3_SECRET_KEY=crawlersupersecretkey
+      - CRAWLER_S3_ENDPOINT_URL=http://minio:9000
   trino:
     build:
       context: ./trino
