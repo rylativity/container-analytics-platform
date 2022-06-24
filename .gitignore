@@ -1,2 +1,6 @@
+venv/
+*.pyc
+.ipynb_checkpoints/
+
 *.parq
 *.parquet

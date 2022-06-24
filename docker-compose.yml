@@ -56,12 +56,17 @@ services:
       exit 0;
       "
   trino:
-    build:
-      context: ./trino
+    build: ./trino
     ports:
       - 8080:8080
   aws:
     image: amazon/aws-cli
+  api:
+    build: ./data_api
+    ports:
+      - 8000:8000
+    volumes:
+      - ./data_api:/app
 
   superset:
     env_file: superset/docker/.env-non-dev
