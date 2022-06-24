@@ -45,7 +45,8 @@ Once you have sample data in Minio, you can register schemas and tables in Hive 
 - [ ] Update README.md with explanation of services
 - [ ] Update README.md with instructions for using example data & init scripts
 - [x] Add Superset to Project for Data Exploration
-- [ ] Add pyhive example query
+- [ ] Add Dynamic FastAPI & Swagger Docs based on Trino Hive tables
+- [ ] Add Minio/S3 schema crawler to crawl buckets and create schemas that can be used to create Hive tables
 - [ ] Add Spark
 
 ## Tips & Troubleshooting
