@@ -18,33 +18,35 @@ log.setLevel("DEBUG")
 
 class Crawler:
 
-    def __init__(self, access_key=S3_ACCESS_KEY, secret_key=S3_SECRET_KEY) -> None:
+    def __init__(self, access_key=S3_ACCESS_KEY, secret_key=S3_SECRET_KEY, endpoint_url=S3_ENDPOINT_URL) -> None:
         log.debug(f"Attempting to initialize Crawler using Access Key ID {access_key}")
         self.s3_client = boto3.client(
             's3',
             aws_access_key_id=access_key,
-            aws_secret_access_key=secret_key
+            aws_secret_access_key=secret_key,
+            endpoint_url=endpoint_url
         )
     
     def crawl_bucket(self, bucket = S3_BUCKET):
-        log.info(f"Crawling bucket {bucket}")
+        log.error(f"Crawling bucket {bucket}")
         
         paginator = self.s3_client.get_paginator('list_objects_v2')
 
         page_iterator = paginator.paginate(Bucket=bucket)
         all_prefixes = []
+        all_keys = []
         for page in page_iterator:
             contents = page["Contents"]
-            keys =  [obj["Key"] for obj in contents]
+            keys = [obj["Key"] for obj in contents]
+            all_keys.append(keys)
             prefixes = ["/".join(k.split("/")[:-1]) for k in keys]
-            ...
+            all_prefixes.extend(prefixes)
+        
+        all_prefixes = list(set(all_prefixes))
+        print(all_keys)
+        print(all_prefixes)
             
 
-
-
-        
-
 if __name__ == "__main__":
-    c = Crawler()
-    res = c.crawl()
-    print(res)
+    c = Crawler(access_key="crawleraccesskey", secret_key="crawlersupersecretkey", endpoint_url="http://localhost:9000")
+    c.crawl_bucket(bucket="test")
