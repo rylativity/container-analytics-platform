@@ -67,7 +67,7 @@ def get_db_structure(exclude_schemas: List[str] = None) -> Dict[str, dict]:
 
 db_structure = get_db_structure(exclude_schemas=["information_schema"])
 
-def generate_api_routes_and_models(db_structure:Dict[str, dict]) -> Dict[str, ModelMetaclass]:
+def generate_api_routes_and_models(db_structure:Dict[str, dict]):
     routes_and_models = {}
     for schema, tables in db_structure.items():
         if tables:
