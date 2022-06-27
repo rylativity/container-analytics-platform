@@ -2,7 +2,6 @@ import logging
 from typing import List, Dict, Optional
 
 from pydantic import BaseModel, create_model
-import pydantic
 
 from sqlalchemy import create_engine
 
@@ -60,10 +59,16 @@ class ModelEndpointFactory:
 
     def get_cols_in_table(self, schema:str, table: str) -> dict:
         
+        # Mapper of various SQL types to python types
         type_mapper = {
+            'integer':int,
             'bigint':int,
+
             'timestamp(3)': str,
+
             'double': float,
+
+            'string': str,
             'varchar': str
         }
         
