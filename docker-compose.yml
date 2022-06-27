@@ -56,12 +56,25 @@ services:
       exit 0;
       "
   trino:
-    build:
-      context: ./trino
+    build: ./trino
     ports:
       - 8080:8080
   aws:
     image: amazon/aws-cli
+  api:
+    build: ./data_api
+    ports:
+      - 8000:8000
+    volumes:
+      - ./data_api:/app
+    environment:
+      - DB_CONNECTION_STRING=trino://trino@trino:8080/hive
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   superset:
     env_file: superset/docker/.env-non-dev
