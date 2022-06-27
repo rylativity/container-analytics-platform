@@ -2,7 +2,7 @@ import logging
 import os
 
 from typing import List, Optional, Union
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, APIRouter, Request, Response
 from fastapi.logger import logger
 
 from util import ModelEndpointFactory, SQLAlchemyDriver
@@ -19,26 +19,30 @@ else:
 
 driver = SQLAlchemyDriver(DB_CONNECTION_STRING)
 
+routers = []
+
 for config in ModelEndpointFactory(DB_CONNECTION_STRING).generate_endpoint_configs():
     
     route = config.route
-    schema_name, table_name = route.split("/")[-2:]
-    if 'taxi' in schema_name:
-        continue
 
+    router = APIRouter(prefix=route)
+    
     pydantic_model = config.pydantic_model
     
-    @app.get(route, response_model=Union[List[pydantic_model], pydantic_model])
-    def func(limit: Optional[int] = 10):
+    @router.get("/", response_model=Union[List[pydantic_model], pydantic_model])
+    def func(request:Request,limit: Optional[int] = 10):
+        schema_name, table_name = request.url.path.strip("/").split("/")[-2:]
         logger.info("TEST")
         query = f"SELECT * FROM {schema_name}.{table_name}\n"
         if limit is not None:
             query += f"LIMIT {limit}"
         return driver.query(query)
-        
-    globals()[f"api_route_{pydantic_model.__name__}"] = func()
-
+    routers.append(router)
+    
 @app.get("/health")
 @app.get("/health/")
 def healthcheck():
     return Response(status_code=200)
+
+for router in routers:
+    app.include_router(router)
