@@ -5,10 +5,7 @@ from pydantic import BaseModel, create_model
 
 from pyhive import trino
 
-class ModelEndpointFactory:
-
-    log = logging.getLogger(__name__)
-    log.setLevel("INFO")
+class TrinoDriver:
 
     def __init__(self, trino_host:str = 'localhost'):
         self.trino_host = trino_host
@@ -21,11 +18,30 @@ class ModelEndpointFactory:
         if not self.conn:
             self.get_conn()
         return self.conn.cursor()
+    
+    def query(self, query_string: str):
+        cursor = self.get_cursor()
+        cursor.execute(query_string)
+        col_names = [row[0] for row in cursor.description]
+        rows = cursor.fetchall()
+        
+        return [
+            {col_names[i]:row[i] for i in range(len(col_names))} 
+                for row in rows]
+
+
+class ModelEndpointFactory:
+
+    log = logging.getLogger(__name__)
+    log.setLevel("INFO")
+
+    def __init__(self, trino_host) -> None:
+        self.trino_driver = TrinoDriver(trino_host=trino_host)
 
     def get_schemas(self, exclude: List[str] = None) -> List[str]:
         
         query_string = "SHOW SCHEMAS"
-        cursor = self.get_cursor()
+        cursor = self.trino_driver.get_cursor()
         cursor.execute(query_string) 
         schemas = [row[0] for row in cursor.fetchall()]
         if exclude is not None:
@@ -35,7 +51,7 @@ class ModelEndpointFactory:
     def get_tables_in_schema(self, schema: str, exclude: List[str] = None) -> List[str]:
         
         query_string = f"SHOW TABLES IN {schema}"
-        cursor = self.get_cursor()
+        cursor = self.trino_driver.get_cursor()
         cursor.execute(query_string) 
         tables = [row[0] for row in cursor.fetchall()]
         if exclude is not None:
@@ -52,7 +68,7 @@ class ModelEndpointFactory:
         }
         
         query_string = f"DESC {schema}.{table}"
-        cursor = self.get_cursor()
+        cursor = self.trino_driver.get_cursor()
         cursor.execute(query_string)
         res = cursor.fetchall()
         col_names = [row[0] for row in res]
