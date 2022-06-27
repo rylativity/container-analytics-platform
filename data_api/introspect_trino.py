@@ -3,47 +3,38 @@ from typing import List, Dict, Optional
 
 from pydantic import BaseModel, create_model
 
-from pyhive import trino
+from sqlalchemy import create_engine
 
-class TrinoDriver:
+class SQLAlchemyDriver:
 
-    def __init__(self, trino_host:str = 'localhost'):
-        self.trino_host = trino_host
-        self.get_conn()
-
-    def get_conn(self):
-        self.conn = trino.connect(self.trino_host)
-    
-    def get_cursor(self):
-        if not self.conn:
-            self.get_conn()
-        return self.conn.cursor()
+    def __init__(self, connection_string:str):
+        self.engine = create_engine(connection_string)
     
     def query(self, query_string: str):
-        cursor = self.get_cursor()
-        cursor.execute(query_string)
-        col_names = [row[0] for row in cursor.description]
-        rows = cursor.fetchall()
-        
-        return [
-            {col_names[i]:row[i] for i in range(len(col_names))} 
-                for row in rows]
+        with self.engine.connect() as conn:
+            result = conn.execute(query_string)
+        return [dict(row) for row in result]
 
+class EndpointConfig:
+    """ Simple Python object representing an endpoint configuration dynamically generated from a SQL table
+    """
+
+    def __init__(self, route:str, pydantic_model: BaseModel, sqlalchemy_model) -> None:
+        pass
 
 class ModelEndpointFactory:
 
     log = logging.getLogger(__name__)
     log.setLevel("INFO")
 
-    def __init__(self, trino_host) -> None:
-        self.trino_driver = TrinoDriver(trino_host=trino_host)
+    def __init__(self, db_connection_string: str) -> None:
+        self.driver = SQLAlchemyDriver(db_connection_string)
 
     def get_schemas(self, exclude: List[str] = None) -> List[str]:
         
         query_string = "SHOW SCHEMAS"
-        cursor = self.trino_driver.get_cursor()
-        cursor.execute(query_string) 
-        schemas = [row[0] for row in cursor.fetchall()]
+        res = self.driver.query(query_string=query_string)
+        schemas = [row['Schema'] for row in res]
         if exclude is not None:
             schemas = [s for s in schemas if s not in exclude]
         return schemas
@@ -51,9 +42,8 @@ class ModelEndpointFactory:
     def get_tables_in_schema(self, schema: str, exclude: List[str] = None) -> List[str]:
         
         query_string = f"SHOW TABLES IN {schema}"
-        cursor = self.trino_driver.get_cursor()
-        cursor.execute(query_string) 
-        tables = [row[0] for row in cursor.fetchall()]
+        res = self.driver.query(query_string=query_string) 
+        tables = [row['Table'] for row in res]
         if exclude is not None:
             tables = [t for t in tables if t not in exclude]
         return tables
@@ -68,11 +58,9 @@ class ModelEndpointFactory:
         }
         
         query_string = f"DESC {schema}.{table}"
-        cursor = self.trino_driver.get_cursor()
-        cursor.execute(query_string)
-        res = cursor.fetchall()
-        col_names = [row[0] for row in res]
-        col_types = [type_mapper[row[1]] for row in res]
+        res = self.driver.query(query_string=query_string)
+        col_names = [row['Column'] for row in res]
+        col_types = [type_mapper[row['Type']] for row in res]
         return dict(zip(col_names, col_types))
 
     def get_schema_structure(self, schema:str) -> dict:
