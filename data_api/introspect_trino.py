@@ -2,6 +2,7 @@ import logging
 from typing import List, Dict, Optional
 
 from pydantic import BaseModel, create_model
+import pydantic
 
 from sqlalchemy import create_engine
 
@@ -19,8 +20,17 @@ class EndpointConfig:
     """ Simple Python object representing an endpoint configuration dynamically generated from a SQL table
     """
 
-    def __init__(self, route:str, pydantic_model: BaseModel, sqlalchemy_model) -> None:
-        pass
+    def __init__(self, route:str, pydantic_model: BaseModel, sqlalchemy_model = None) -> None:
+        self.route=route
+        self.pydantic_model=pydantic_model
+        self.sqlalchemy_model=sqlalchemy_model
+
+    def to_dict(self):
+        return {
+            "route":self.route,
+            "pydantic_model":self.pydantic_model,
+            "sqlalchemy_model":self.sqlalchemy_model
+        }
 
 class ModelEndpointFactory:
 
@@ -79,8 +89,8 @@ class ModelEndpointFactory:
             db_structure[schema] = self.get_schema_structure(schema=schema)
         return db_structure
 
-    def generate_api_routes_and_models(self, db_structure:Optional[Dict[str, dict]] = None) -> Dict[str, BaseModel]:
-        routes_and_models = {}
+    def generate_endpoint_configs(self, db_structure:Optional[Dict[str, dict]] = None) -> List[EndpointConfig]:
+        endpoint_configs = []
         if db_structure is None:
             db_structure = self.get_db_structure(exclude_schemas=["information_schema"]).items()
         for schema, tables in db_structure:
@@ -91,12 +101,14 @@ class ModelEndpointFactory:
                     # create_model expects fields to be tuples of the form (<type>, <default_val>)
                     # the dict_comprehension below formats the fields in the call to create_model
                     # wrapping in Optional[] and setting default of ... makes field nullable
-                    model = create_model(model_name, **{k:(Optional[v],...) for k,v in cols.items()})
-                    self.log.info(f"Created model for table {table} with schema\n {model.schema()}")
-                    routes_and_models[route] = model
-        return routes_and_models
+                    pydantic_model = create_model(model_name, **{k:(Optional[v],...) for k,v in cols.items()})
+                    self.log.info(f"Created model for table {table} with schema\n {pydantic_model.schema()}")
+                    config = EndpointConfig(route = route, pydantic_model = pydantic_model)
+                    endpoint_configs.append(config)
+        return endpoint_configs
 
 if __name__ == "__main__":
-    factory = ModelEndpointFactory(trino_host="localhost")
-    routes_and_models = factory.generate_api_routes_and_models()
+    factory = ModelEndpointFactory(db_connection_string="trino://trino@localhost:8080/hive")
+    configs = factory.generate_endpoint_configs()
+    print([c.to_dict() for c in configs])
 
