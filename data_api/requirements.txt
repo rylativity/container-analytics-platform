@@ -1,5 +1,0 @@
-requests
-fastapi
-uvicorn[standard]
-sqlalchemy
-trino

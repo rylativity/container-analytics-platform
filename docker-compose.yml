@@ -61,20 +61,19 @@ services:
       - 8080:8080
   aws:
     image: amazon/aws-cli
-  api:
-    build: ./data_api
-    ports:
-      - 8000:8000
-    volumes:
-      - ./data_api:/app
-    environment:
-      - DB_CONNECTION_STRING=trino://trino@trino:8080/hive
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 15s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+  
+  # autoapi:
+  #   image: rms113/autoapi:latest
+  #   restart: unless-stopped
+  #     - 8000:8000
+  #   environment:
+  #     - DB_CONNECTION_STRING=trino://trino@trino:8080/hive
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+  #     interval: 15s
+  #     timeout: 5s
+  #     retries: 3
+  #     start_period: 10s
 
   superset:
     env_file: superset/docker/.env-non-dev
@@ -114,6 +113,32 @@ services:
     restart: unless-stopped
     volumes:
       - redis:/data
+  
+  # mongo:
+  #   image: mongo
+  #   restart: unless-stopped
+  #   environment:
+  #     MONGO_INITDB_DATABASE: mongo
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: example
+  #   ports:
+  #     - 27017:27017
+  #   volumes:
+  #     - mongo_data:/data/db
+  
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.16.0
+  #   environment:
+  #     - "ES_JAVA_OPTS=-Xms1024m -Xmx2g"
+  #     - discovery.type=single-node
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #   volumes:
+  #     - elasticsearch_data:/usr/share/elasticsearch/data
+  #   ports:
+  #     - 9200:9200
 
 volumes:
   postgres-db:
@@ -121,3 +146,5 @@ volumes:
   minio-data:
   superset_home:
   redis:
+  # elasticsearch_data:
+  # mongo_data: 
