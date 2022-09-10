@@ -10,22 +10,32 @@ The docker-compose.yml also defines an ElasticSearch service and a MongoDB servi
 - A high level understanding of Trino (or Presto), Hive Standalone Metastore, and S3 or Minio (if you don't know about any of these, spend a few minutes researching them and then return here to continue)
 
 ## Setup
-- Run `docker-compose up -d` (This will bring up the containers, initalize the metastore postgres database, create a 'test' bucket with public permissions in Minio, and create a Minio service account access-key/secret)
-- Once the containers are running and the initialization is complete, run `./dataload_scripts/load_taxidata_to_minio.sh` (This will download NYC Taxi Data from the year 2022 and store in in the public 'test' bucket in Minio)
-- Once the taxi data is available in Minio, you can exec into the Trino container to create the Hive schemas and tables.  Run `docker-compose exec trino trino` to open the Trino shell in the Trino container.  See ./dataload_scripts/trino_commands.txt for examples of how to create Hive schemas and tables. Alternatively, if you are using the NYC Taxi example data, you can run `./dataload_scripts/register_trino_hive_tables.sh`, which will pass the commands in trino_commands.txt to the Trino shell in the Trino container for execution.
-- The trino service is configured to use 2GB of RAM maximum.  If you want Trino to use more or less memory, modify the "-Xmx" value in trino/conf/jvm.config.
+- Run `docker-compose up -d` (This will bring up the containers, initalize the metastore postgres database, create a 'test' bucket with public permissions in Minio, and create Minio service account access-keys/secrets for Spark and Trino)
+- Once the containers have started, navigate to Jupyter Lab at http://localhost:8888. Run the included notebook to write some Delta Lake tables. This is also a great way to learn a bit about PySpark & Delta Lake. (All code should run as-is). This essentially simulates placing data in an S3 bucket (e.g. as the result of an ETL job)
+- Navigate to the Superset UI at http://localhost:8088 and log in with the username and password below (or in the docker-compose.yml). Connect Superset to Trino (and by extension the Delta Lake tables in Minio which Trino can read like SQL tables) by selecting Data > Databases > +Database > Select Trino as DB Type > Set SQLAlchemy URI = 'trino://trino@trino:8080/delta'; also make sure to expose the database in SQL Lab and check the boxes next to "Allow CREATE TABLE AS", "Allow CREATE VIEW AS", and "Allow DML" under the 'Advanced' options.
+- Navigate to SQL Lab in the Superset UI, select the new Trino database connection from the appropriate dropdown menu, and run the SQL commands listed below under the "Superset" section of this README. These commands show you how to read Delta Lake tables through Trino & Superset without having to specify the schema ahead of time!
 
-Minio UI - http://localhost:9090 (user: minio, password: minio123)
-
-Trino UI - http://localhost:8080 (user: *any*)
-
-Trino Shell - `docker-compose exec trino trino` (Use this to run SQL commands against data in Minio)
-
-Superset UI - http://localhost:8088 (user: admin, password: admin)
+## Service Endpoints
+- Jupyter Lab - http://localhost:8888
+- Spark UI - http://localhost:8090
+- Minio UI - http://localhost:9090 (user: minio, password: minio123)
+- Trino UI - http://localhost:8080 (user: *any*)
+- Superset UI - http://localhost:8088 (user: admin, password: admin)
+- Trino Shell - `docker-compose exec trino trino` (Use this to run SQL commands against data in Minio)
+*Any host ports can be changed in the docker-compose.yml*
 
 ***
 
 ## Explanation and Usage of Services in the Docker-Compose.yml
+
+### Jupyter
+##### DOCUMENTATION TODO #####
+
+### Spark/Spark-Worker
+##### DOCUMENTATION TODO #####
+
+### Delta Lake
+##### DOCUMENTATION TODO #####
 
 ### Minio
 Minio is an S3-Compatible object store that can be run locally or on any cloud platform.  In other words, Minio is a free, drop-in replacement for S3 that you have full control over.  In addition to countless other uses, Minio is a great standin for S3 while doing local development.
@@ -34,19 +44,19 @@ Credentials for Minio (including the admin username, password, and service accou
 
 You can access the minio console at http://localhost:9090. You can create buckets and upload files through the Minio Console.  
 
-Buckets in the Minio Object Store are programatically accessable at http://localhost:9000.  Any operations you would performa against an S3 bucket can be performed against the Minio Object Store.  
+Buckets in the Minio Object Store are programatically accessable at http://localhost:9000.  Any operations you would perform against an S3 bucket can be performed against the Minio Object Store.  
 
-You can use the AWS CLI v2 to interact with a Minio bucket as if it were an S3 bucket by specifying the endpoint URL.  For example, to list the objects in a **public** Minio bucket called `test`, you would run:
+For example, you can use the AWS CLI v2 to interact with a Minio bucket as if it were an S3 bucket by specifying the endpoint URL.  For example, to list the objects in a **public** Minio bucket called `test`, you would run:
 `aws --endpoint-url http://localhost:9000 s3 ls s3://test/ --no-sign-request`.
 
-To add some sample data to Minio, run `./dataload_scripts/load_taxidata_to_minio.sh`, which will download the NYC Yellow Cab trip data in parquet format and upload it to the Minio "test" bucket (which is created by the 'createbuckets' container defined in docker-compose.yml)
+
 
 ***
 
 ### Trino
 Trino is a distributed query engine that can connect to many different datasources including SQL databases, document databases (e.g. MongoDB), and even data files sitting in S3 (by leveraging a Hive Standalone Metastore).  Trino will even allow you to execute queries that pull in data from different datasources (e.g. you can query data from S3 and left join in a SQL table in a single query).
 
-Once you have sample data in Minio, you can register schemas and tables in Hive using the Trino CLI.  If you loaded the sample NYC Yellow Cab trip data to Minio (as described above), you can run `./dataload_scripts/register_trino_hive_tables.sh`, which will execute the Trino commands to create a new schema and add a table with the external Minio data location as the source.
+Once you have Delta Lake data in Minio (S3), you can read Delta Tables directly from Trino through the trino shell (or through Superset SQL Lab; see setup steps at top of README for instructions for adding sample data and connecting Superset).
 
 Example Commands - https://trino.io/docs/current/connector/hive.html#examples
 
@@ -69,49 +79,46 @@ Apache Superset is arguably one of the best BI tools available, ignoring the fac
 
 Superset is accessible at http://localhost:8088 (Username: admin, Password: admin) once you have gone through the setup steps.  To connect Superset to Trino using Superset's Trino connector, login to the Superset UI and add Trino as a Database (select "Data" > "Databases" > "+Database" > "Trino", the SQLALCHEMY URI should be "trino://trino@trino:8080/hive" - the hostname/URL "trino" is simply the docker service name of trino as defined in the docker-compose.yml).
 
-Once connected, Superset's SQL Lab Editor can be used as a frontend for the Trino query engine (which in turn can be used to query/manage data in of S3 using the Hive Standalone Metastore).
+Once connected, Superset's SQL Lab Editor can be used as a frontend for the Trino query engine (which in turn can be used to query Delta Lake tables directly from Minio(S3)).
 
-The file dataload_scripts/trino_commands.txt contains an example of using Trino to connect to a read-only dataset in S3.  To create a Trino managed dataset (i.e. read-write), first create a bucket in Minio (http://localhost:9090 after you've started the containers), and then run the commands below (substituting your S3 bucket name and your desired table structure) in the Superset SQL Lab Editor:
+A cloud object store bucket called 'test' is automatically created for you in Minio (navigate to http://localhost:9090 after you've started the containers and log in with the username and password from the docker-compose.yml)
+
+Run the SQL commands below  in the Superset SQL Lab Editor to have Trino automatically read Delta Lake (without having to provide schema ahead of time). DO NOT REPLACE THE "dummy bigint" column definition in the CREATE TABLE statment - Trino will ignore that column definition and read the schema from Delta:
 ```
--- Create a Trino-managed Hive schema using the S3 bucket
-CREATE SCHEMA hive.mybucket
-WITH (location = 's3a://mybucket/');
+-DROP SCHEMA IF EXISTS delta.my_schema;
 
--- Create an example Hive table in the Trino-managed schema
-CREATE TABLE hive.mybucket.users (
-  user_id bigint,
-  username varchar,
-  country varchar
+CREATE SCHEMA delta.my_schema
+WITH (location = 's3a://test/');
+
+CREATE TABLE delta.my_schema.my_table (
+  dummy bigint
 )
 WITH (
-  format = 'ORC',
-  partitioned_by = ARRAY['country'],
-  bucketed_by = ARRAY['user_id'],
-  bucket_count = 50
-);
+  location = 's3a://test/appl_stock_delta_table'
+)
 
--- Insert sample data into the Trino-managed Hive table
-INSERT INTO hive.mybucket.users (user_id, username, country)
-VALUES (1, 'first_username', 'USA'),
-        (2, 'second_username', 'Mexico');
+SELECT * FROM delta.my_schema.my_table;
 
 -- Drop tables and schemas if desired (YOU MUST STILL MANUALLY DELETE THE DATA FROM S3)
--- DROP TABLE hive.mybucket.users;
--- DROP SCHEMA hive.mybucket;
+-- DROP TABLE delta.my_schema.my_table;
+-- DROP SCHEMA delta.my_schema.my_table;
 ```
 
 ## Roadmap
 - [x] Initalize Minio (by creating bucket and adding taxi Parquet data - https://registry.opendata.aws/nyc-tlc-trip-records-pds/) 
 - [x] Initialize Trino (by creating a hive table from Parquet taxi data in Minio)
 - [x] Resolve bug in Standalone Metastore (NoSuchObjectException 'hive.<schema>.<table>' no such table) when attempting to create hive table
+- [ ] Document a demo walkthrough of steps to do when first starting with project
+- [ ] Develop frontend Vue application to display services in central location
+- [ ] Add NginX reverse proxy for services
 - [ ] Update README.md with explanation of services
+  - [ ] Jupyter
+  - [ ] Spark
+  - [ ] Delta Lake
+  - [ ] Add Screenshots
 - [ ] Update README.md with instructions for using example data & init scripts
 - [x] Add Superset to Project for Data Exploration
 - [ ] Add Dynamic FastAPI & Swagger Docs based on Trino Hive tables (created as separate project - https://github.com/rylativity/autoapi)
-- [ ] Update README.md with explanation and instructions for Dynamic FastAPI service
 - [ ] Add Minio/S3 schema crawler to crawl buckets and create schemas that can be used to create Hive tables
-- [ ] Add Spark+Jupyter & Delta containers and examples
+- [x] Add Spark+Jupyter & Delta containers and examples
 - [ ] Add Presto as alternative to Trino
-
-## Tips & Troubleshooting
- - Stick with bucketnames that use only lowercase letters and no special characters.  

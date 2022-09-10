@@ -10,6 +10,18 @@ x-superset-volumes: &superset-volumes
   - superset_home:/app/superset_home
 
 services:
+  jupyter:
+    build: ./jupyter/
+    environment:
+      - S3_ENDPOINT=http://minio:9000
+      - S3_BUCKET=test
+      - S3_ACCESS_KEY=sparkaccesskey
+      - S3_SECRET_KEY=sparksupersecretkey
+    ports: 
+      - 8888:8888
+    volumes:
+      - ./data:/data
+      - ./jupyter/notebooks/:/notebooks/
   postgres:
     image: postgres:latest
     environment:
@@ -43,37 +55,16 @@ services:
       - 9090:9090
       - 9000:9000
   minio-init:
-    image: minio/mc # MinioClient image; use it to make buckets and perform any other tasks on startup
+    build: ./minio # MinioClient image; use it to make buckets and perform any other tasks on startup
     depends_on:
       - minio
-    entrypoint: >
-      /bin/sh -c "
-      sleep 3;
-      /usr/bin/mc alias set myminio http://minio:9000 minio minio123;
-      /usr/bin/mc mb myminio/test;
-      /usr/bin/mc policy set public myminio/test;
-      /usr/bin/mc admin user svcacct add --access-key 'trinohiveaccesskey' --secret-key 'trinohivesupersecretkey' myminio minio;
-      exit 0;
-      "
   trino:
     build: ./trino
     ports:
       - 8080:8080
+
   aws:
     image: amazon/aws-cli
-  
-  # autoapi:
-  #   image: rms113/autoapi:latest
-  #   restart: unless-stopped
-  #     - 8000:8000
-  #   environment:
-  #     - DB_CONNECTION_STRING=trino://trino@trino:8080/hive
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-  #     interval: 15s
-  #     timeout: 5s
-  #     retries: 3
-  #     start_period: 10s
 
   superset:
     env_file: superset/docker/.env-non-dev
@@ -113,6 +104,32 @@ services:
     restart: unless-stopped
     volumes:
       - redis:/data
+  spark:
+    build: ./spark
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    ports:
+      - '8090:8080'
+      - '7077:7077'
+    volumes:
+      - ./data:/data
+  spark-worker:
+    build: ./spark
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    volumes:
+      - ./data:/data
   
   # mongo:
   #   image: mongo
