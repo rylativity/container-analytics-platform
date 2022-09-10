@@ -6,6 +6,7 @@ FROM azul/zulu-openjdk:11
 SHELL ["/bin/bash","-c"]
 
 ARG TRINO_SERVER_VERSION=395
+ARG HADOOP_VERSION=3.2.0
 
 RUN set -euxo pipefail && \
      apt-get update && \
@@ -22,8 +23,8 @@ RUN set -euxo pipefail && \
     chmod a+x /opt/trino/bin/launcher /usr/bin/trino && \
     mkdir -p /var/trino/data/ && chown -R trino /var/trino /usr/bin/trino && chmod -R o+rwx /var/trino && \
     mkdir /etc/hive_metastore && chown -R trino /etc/hive_metastore && \
-    curl https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-common/3.2.0/hadoop-common-3.2.0.jar -o /opt/trino/plugin/hive/hadoop-common-3.2.0.jar && \
-    curl https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.2.0/hadoop-aws-3.2.0.jar -o /opt/trino/plugin/hive/hadoop-aws-3.2.0.jar && \
+    curl https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-common/${HADOOP_VERSION}/hadoop-common-${HADOOP_VERSION}.jar -o /opt/trino/plugin/hive/hadoop-common-${HADOOP_VERSION}.jar && \
+    curl https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/${HADOOP_VERSION}/hadoop-aws-${HADOOP_VERSION}.jar -o /opt/trino/plugin/hive/hadoop-aws-${HADOOP_VERSION}.jar && \
     curl https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.230/aws-java-sdk-bundle-1.12.230.jar -o /opt/trino/plugin/hive/aws-java-sdk-bundle-1.12.230.jar
 COPY conf /opt/trino/etc
 
