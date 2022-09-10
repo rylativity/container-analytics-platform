@@ -12,7 +12,7 @@ The docker-compose.yml also defines an ElasticSearch service and a MongoDB servi
 ## Setup
 - Run `docker-compose up -d` (This will bring up the containers, initalize the metastore postgres database, create a 'test' bucket with public permissions in Minio, and create Minio service account access-keys/secrets for Spark and Trino)
 - Once the containers have started, navigate to Jupyter Lab at http://localhost:8888. Run the included notebook to write some Delta Lake tables. This is also a great way to learn a bit about PySpark & Delta Lake. (All code should run as-is). This essentially simulates placing data in an S3 bucket (e.g. as the result of an ETL job)
-- Navigate to the Superset UI at http://localhost:8088 and log in with the username and password below (or in the docker-compose.yml). Connect Superset to Trino (and by extension the Delta Lake tables in Minio which Trino can read like SQL tables) by selecting Data > Databases > +Database > Select Trino as DB Type > Set SQLAlchemy URI = 'trino://trino@trino:8080/delta'; also make sure to expose the database in SQL Lab under the 'Advanced' options.
+- Navigate to the Superset UI at http://localhost:8088 and log in with the username and password below (or in the docker-compose.yml). Connect Superset to Trino (and by extension the Delta Lake tables in Minio which Trino can read like SQL tables) by selecting Data > Databases > +Database > Select Trino as DB Type > Set SQLAlchemy URI = 'trino://trino@trino:8080/delta'; also make sure to expose the database in SQL Lab and check the boxes next to "Allow CREATE TABLE AS", "Allow CREATE VIEW AS", and "Allow DML" under the 'Advanced' options.
 - Navigate to SQL Lab in the Superset UI and run the SQL commands listed below under the "Superset" section of this README. These commands show you how to read Delta Lake tables through Trino & Superset without having to specify the schema ahead of time!
 
 ## Service Endpoints
@@ -113,6 +113,7 @@ WITH (
   - [ ] Jupyter
   - [ ] Spark
   - [ ] Delta Lake
+  - [ ] Add Screenshots
 - [ ] Update README.md with instructions for using example data & init scripts
 - [x] Add Superset to Project for Data Exploration
 - [ ] Add Dynamic FastAPI & Swagger Docs based on Trino Hive tables (created as separate project - https://github.com/rylativity/autoapi)
