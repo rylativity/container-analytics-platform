@@ -55,14 +55,14 @@ services:
       - 9090:9090
       - 9000:9000
   minio-init:
-    image: minio/mc # MinioClient image; use it to make buckets and perform any other tasks on startup
+    build: ./minio # MinioClient image; use it to make buckets and perform any other tasks on startup
     depends_on:
       - minio
-    entrypoint: ["/bin/bash", "-c", "/docker-entrypoint-initdb.d/entrypoint.sh"]
   trino:
     build: ./trino
     ports:
       - 8080:8080
+
   aws:
     image: amazon/aws-cli
 
@@ -113,7 +113,7 @@ services:
       - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
       - SPARK_SSL_ENABLED=no
     ports:
-      - '8080:8080'
+      - '8090:8080'
       - '7077:7077'
     volumes:
       - ./data:/data
