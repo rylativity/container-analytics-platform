@@ -5,7 +5,7 @@ FROM azul/zulu-openjdk:11
 
 SHELL ["/bin/bash","-c"]
 
-ARG TRINO_SERVER_VERSION=386
+ARG TRINO_SERVER_VERSION=395
 
 RUN set -euxo pipefail && \
      apt-get update && \
