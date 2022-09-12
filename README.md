@@ -95,7 +95,7 @@ CREATE TABLE delta.my_schema.my_table (
 )
 WITH (
   location = 's3a://test/appl_stock_delta_table'
-)
+);
 
 SELECT * FROM delta.my_schema.my_table;
 
