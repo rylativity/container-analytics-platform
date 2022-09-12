@@ -85,7 +85,7 @@ A cloud object store bucket called 'test' is automatically created for you in Mi
 
 Run the SQL commands below  in the Superset SQL Lab Editor to have Trino automatically read Delta Lake (without having to provide schema ahead of time). DO NOT REPLACE THE "dummy bigint" column definition in the CREATE TABLE statment - Trino will ignore that column definition and read the schema from Delta:
 ```
--DROP SCHEMA IF EXISTS delta.my_schema;
+DROP SCHEMA IF EXISTS delta.my_schema;
 
 CREATE SCHEMA delta.my_schema
 WITH (location = 's3a://test/');
