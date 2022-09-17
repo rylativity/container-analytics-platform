@@ -23,7 +23,7 @@ services:
       - ./data:/data
       - ./jupyter/notebooks/:/notebooks/
   postgres:
-    image: postgres:latest
+    image: postgres:14
     environment:
       - POSTGRES_USER=hive
       - POSTGRES_PASSWORD=hive
