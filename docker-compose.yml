@@ -7,6 +7,7 @@ x-superset-depends-on: &superset-depends-on
 x-superset-volumes: &superset-volumes
   # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
   - ./superset/docker:/app/docker
+  - ./superset/config.py:/app/superset/config.py
   - superset_home:/app/superset_home
 
 services:
