@@ -122,3 +122,6 @@ SELECT * FROM delta.my_schema.my_table;
 - [ ] Add Minio/S3 schema crawler to crawl buckets and create schemas that can be used to create Hive tables
 - [x] Add Spark+Jupyter & Delta containers and examples
 - [ ] Add Presto as alternative to Trino
+
+## Troubleshooting
+- While you can have multiple Trino catalog connectors of type hive and delta, schema names must be globally unique (i.e. a schema name defined in a hive connection cannot be used in a delta connection)
