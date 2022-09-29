@@ -110,7 +110,7 @@ SELECT * FROM delta.my_schema.my_table;
 - [x] Resolve bug in Standalone Metastore (NoSuchObjectException 'hive.<schema>.<table>' no such table) when attempting to create hive table
 - [ ] Document a demo walkthrough of steps to do when first starting with project
 - [ ] Develop frontend Vue application to display services in central location
-- [ ] Add NginX reverse proxy for services
+- [ ] Add reverse proxy (preferably Traefik or NginX) for services
 - [ ] Update README.md with explanation of services
   - [ ] Jupyter
   - [ ] Spark
