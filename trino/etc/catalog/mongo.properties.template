@@ -1,0 +1,3 @@
+connector.name=mongodb
+mongodb.seeds=mongo:27017
+mongodb.credentials=root:example@admin
