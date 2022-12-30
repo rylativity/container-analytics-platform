@@ -133,7 +133,7 @@ services:
       - ./data:/data
   
   # mongo:
-  #   image: mongo
+  #   image: mongo:6.0
   #   restart: unless-stopped
   #   environment:
   #     MONGO_INITDB_DATABASE: mongo
@@ -145,7 +145,7 @@ services:
   #     - mongo_data:/data/db
   
   # elasticsearch:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.16.0
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
   #   environment:
   #     - "ES_JAVA_OPTS=-Xms1024m -Xmx2g"
   #     - discovery.type=single-node
@@ -164,5 +164,5 @@ volumes:
   minio-data:
   superset_home:
   redis:
-  # elasticsearch_data:
-  # mongo_data: 
+  elasticsearch_data:
+  mongo_data: 
