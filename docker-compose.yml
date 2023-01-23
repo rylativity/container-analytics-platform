@@ -32,6 +32,7 @@ services:
     volumes:
       - postgres-db:/var/lib/postgresql/data
       - ./superset/init_supersetdb.sql:/docker-entrypoint-initdb.d/init_supersetdb.sql
+      - ./init_postgresdb.sql:/docker-entrypoint-initdb.d/init_postgresdb.sql
     healthcheck:
       test: ["CMD", "pg_isready","-U", "hive", "metadata"]
     restart: always
@@ -132,31 +133,31 @@ services:
     volumes:
       - ./data:/data
   
-  # mongo:
-  #   image: mongo:6.0
-  #   restart: unless-stopped
-  #   environment:
-  #     MONGO_INITDB_DATABASE: mongo
-  #     MONGO_INITDB_ROOT_USERNAME: root
-  #     MONGO_INITDB_ROOT_PASSWORD: example
-  #   ports:
-  #     - 27017:27017
-  #   volumes:
-  #     - mongo_data:/data/db
+  mongo:
+    image: mongo:6.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: mongo
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
   
-  # elasticsearch:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
-  #   environment:
-  #     - "ES_JAVA_OPTS=-Xms1024m -Xmx2g"
-  #     - discovery.type=single-node
-  #   ulimits:
-  #     memlock:
-  #       soft: -1
-  #       hard: -1
-  #   volumes:
-  #     - elasticsearch_data:/usr/share/elasticsearch/data
-  #   ports:
-  #     - 9200:9200
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    environment:
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx2g"
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
 
 volumes:
   postgres-db:

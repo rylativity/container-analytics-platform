@@ -3,3 +3,6 @@ delta-spark==2.1.0
 elasticsearch
 pymongo
 faker
+sqlalchemy
+pandas
+psycopg2
