@@ -32,7 +32,6 @@ services:
     volumes:
       - postgres-db:/var/lib/postgresql/data
       - ./superset/init_supersetdb.sql:/docker-entrypoint-initdb.d/init_supersetdb.sql
-      - ./init_postgresdb.sql:/docker-entrypoint-initdb.d/init_postgresdb.sql
     healthcheck:
       test: ["CMD", "pg_isready","-U", "hive", "metadata"]
     restart: always
