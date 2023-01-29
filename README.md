@@ -120,6 +120,7 @@ SELECT * FROM delta.my_schema.my_table;
 - [ ] Update README.md with instructions for using example data & init scripts
 - [x] Add Superset to Project for Data Exploration
 - [x] Add Datahub Data Catalog (implemented on branch `datahub`. Is fairly resource intensive, and often requires multiple runs of `docker-compoe up mysql-setup elasticsearch-setup` before `docker-compose up -d`)
+- [ ] Build out datahub automated startup process
 - [ ] Add Dynamic FastAPI & Swagger Docs based on Trino Hive tables (created as separate project - https://github.com/rylativity/autoapi)
 - [ ] Add Minio/S3 schema crawler to crawl buckets and create schemas that can be used to create Hive tables
 - [x] Add Spark+Jupyter & Delta containers and examples
