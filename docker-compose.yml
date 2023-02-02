@@ -327,6 +327,16 @@ services:
       - ${DATAHUB_MAPPED_ZK_PORT:-2181}:2181
     volumes:
       - zkdata:/var/lib/zookeeper
+  nginx:
+    build: 
+      context: ./nginx
+      dockerfile: nginx.Dockerfile
+    ports: 
+      - 80:80
+      - 443:443
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:80']
+    restart: always
 
 volumes:
   postgres-db:
