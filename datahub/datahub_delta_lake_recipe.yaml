@@ -1,11 +1,11 @@
 source:
-    type: delta-lake
-    config:
-        env: PROD
-        base_path: 's3://test/'
-        s3:
-            aws_config:
-                aws_endpoint_url: 'http://minio:9000'
-                aws_access_key_id: trinohiveaccesskey
-                aws_secret_access_key: trinohivesupersecretkey
-                aws_region: us-east-1
+  type: delta-lake
+  config:
+    env: PROD
+    base_path: 's3://test/'
+    s3:
+      aws_config:
+        aws_endpoint_url: 'http://minio:9000'
+        aws_access_key_id: trinohiveaccesskey
+        aws_secret_access_key: trinohivesupersecretkey
+        aws_region: us-east-1

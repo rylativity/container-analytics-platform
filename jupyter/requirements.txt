@@ -6,3 +6,4 @@ faker
 sqlalchemy
 pandas
 psycopg2
+deltalake
