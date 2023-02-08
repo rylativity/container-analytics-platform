@@ -1,15 +1,5 @@
 version: '3.9'
 
-x-superset-image: &superset-image apache/superset:2.0.0
-x-superset-depends-on: &superset-depends-on
-  - postgres
-  - redis
-x-superset-volumes: &superset-volumes
-  # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
-  - ./superset/docker:/app/docker
-  - ./superset/config.py:/app/superset/config.py
-  - superset_home:/app/superset_home
-
 services:
   jupyter:
     build: ./jupyter/
@@ -62,75 +52,10 @@ services:
   trino:
     build: ./trino
     ports:
-      - 8080:8080
+      - 8880:8080
 
   aws:
     image: amazon/aws-cli
-
-  superset:
-    env_file: superset/docker/.env-non-dev
-    image: *superset-image
-    command: ["/app/docker/docker-bootstrap.sh", "app-gunicorn"]
-    user: "root"
-    restart: unless-stopped
-    ports:
-      - 8088:8088
-    depends_on: *superset-depends-on
-    volumes: *superset-volumes
-  superset-init:
-    image: *superset-image
-    command: ["/app/docker/docker-init.sh"]
-    env_file: superset/docker/.env-non-dev
-    depends_on: *superset-depends-on
-    user: "root"
-    volumes: *superset-volumes
-  superset-worker:
-    image: *superset-image
-    command: ["/app/docker/docker-bootstrap.sh", "worker"]
-    env_file: superset/docker/.env-non-dev
-    restart: unless-stopped
-    depends_on: *superset-depends-on
-    user: "root"
-    volumes: *superset-volumes
-  superset-worker-beat:
-    image: *superset-image
-    command: ["/app/docker/docker-bootstrap.sh", "beat"]
-    env_file: superset/docker/.env-non-dev
-    restart: unless-stopped
-    depends_on: *superset-depends-on
-    user: "root"
-    volumes: *superset-volumes
-  redis:
-    image: redis:latest
-    restart: unless-stopped
-    volumes:
-      - redis:/data
-  spark:
-    build: ./spark
-    environment:
-      - SPARK_MODE=master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-    ports:
-      - '8090:8080'
-      - '7077:7077'
-    volumes:
-      - ./data:/data
-  spark-worker:
-    build: ./spark
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark:7077
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=1
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-    volumes:
-      - ./data:/data
   
   # mongo:
   #   image: mongo:6.0
@@ -158,11 +83,22 @@ services:
   #   ports:
   #     - 9200:9200
 
+  
+  # nginx:
+  #   build: 
+  #     context: ./nginx
+  #     dockerfile: nginx.Dockerfile
+  #   ports: 
+  #     - 80:80
+  #     - 443:443
+  #   healthcheck:
+  #     test: ['CMD', 'curl', '-f', 'http://localhost:80']
+  #   restart: always
+
 volumes:
   postgres-db:
   hive-data:
   minio-data:
-  superset_home:
-  redis:
-  elasticsearch_data:
-  mongo_data: 
+  # elasticsearch_data:
+  # mongo_data: 
+

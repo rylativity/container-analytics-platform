@@ -108,20 +108,25 @@ SELECT * FROM delta.my_schema.my_table;
 - [x] Initalize Minio (by creating bucket and adding taxi Parquet data - https://registry.opendata.aws/nyc-tlc-trip-records-pds/) 
 - [x] Initialize Trino (by creating a hive table from Parquet taxi data in Minio)
 - [x] Resolve bug in Standalone Metastore (NoSuchObjectException 'hive.<schema>.<table>' no such table) when attempting to create hive table
+- [ ] Add example notebook using delta-rs python bindings to interact with delta lake
 - [ ] Document a demo walkthrough of steps to do when first starting with project
 - [ ] Develop frontend Vue application to display services in central location
 - [ ] Add reverse proxy (preferably Traefik or NginX) for services
-- [ ] Update README.md with explanation of services
+- [ ] Update README.md with explanation of services and instructions for including datahub, spark, and superset in startup
+- [ ] Split up docker-compose to create a set of base services (with lower resource usage) and optional add-ons
+- [ ] Add detailed usage guides for services
   - [ ] Jupyter
   - [ ] Spark
   - [ ] Delta Lake
+  - [ ] DataHub
   - [ ] Add Screenshots
 - [ ] Update README.md with instructions for using example data & init scripts
 - [x] Add Superset to Project for Data Exploration
-- [ ] Add Dynamic FastAPI & Swagger Docs based on Trino Hive tables (created as separate project - https://github.com/rylativity/autoapi)
+- [x] Add Datahub Data Catalog (implemented on branch `datahub`. Is fairly resource intensive, and often requires multiple runs of `docker-compoe up mysql-setup elasticsearch-setup` before `docker-compose up -d`)
+- [ ] Build out datahub automated startup process
+- [x] Add Dynamic FastAPI & Swagger Docs based on Trino Hive tables (created as separate project - https://github.com/rylativity/autoapi)
 - [ ] Add Minio/S3 schema crawler to crawl buckets and create schemas that can be used to create Hive tables
 - [x] Add Spark+Jupyter & Delta containers and examples
-- [ ] Add Presto as alternative to Trino
 
 ## Troubleshooting
 - While you can have multiple Trino catalog connectors of type hive and delta, schema names must be globally unique (i.e. a schema name defined in a hive connection cannot be used in a delta connection)
