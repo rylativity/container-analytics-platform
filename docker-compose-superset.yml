@@ -1,0 +1,55 @@
+version: '3.9'
+
+x-superset-image: &superset-image apache/superset:2.0.0
+x-superset-depends-on: &superset-depends-on
+  - postgres
+  - redis
+x-superset-volumes: &superset-volumes
+  # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
+  - ./superset/docker:/app/docker
+  - ./superset/config.py:/app/superset/config.py
+  - superset_home:/app/superset_home
+
+services:
+  superset:
+    env_file: superset/docker/.env-non-dev
+    image: *superset-image
+    command: ["/app/docker/docker-bootstrap.sh", "app-gunicorn"]
+    user: "root"
+    restart: unless-stopped
+    ports:
+      - 8088:8088
+    depends_on: *superset-depends-on
+    volumes: *superset-volumes
+  superset-init:
+    image: *superset-image
+    command: ["/app/docker/docker-init.sh"]
+    env_file: superset/docker/.env-non-dev
+    depends_on: *superset-depends-on
+    user: "root"
+    volumes: *superset-volumes
+  superset-worker:
+    image: *superset-image
+    command: ["/app/docker/docker-bootstrap.sh", "worker"]
+    env_file: superset/docker/.env-non-dev
+    restart: unless-stopped
+    depends_on: *superset-depends-on
+    user: "root"
+    volumes: *superset-volumes
+  superset-worker-beat:
+    image: *superset-image
+    command: ["/app/docker/docker-bootstrap.sh", "beat"]
+    env_file: superset/docker/.env-non-dev
+    restart: unless-stopped
+    depends_on: *superset-depends-on
+    user: "root"
+    volumes: *superset-volumes
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    volumes:
+      - redis:/data
+
+volumes:
+  superset_home:
+  redis:
