@@ -108,6 +108,7 @@ SELECT * FROM delta.my_schema.my_table;
 - [x] Initalize Minio (by creating bucket and adding taxi Parquet data - https://registry.opendata.aws/nyc-tlc-trip-records-pds/) 
 - [x] Initialize Trino (by creating a hive table from Parquet taxi data in Minio)
 - [x] Resolve bug in Standalone Metastore (NoSuchObjectException 'hive.<schema>.<table>' no such table) when attempting to create hive table
+- [ ] Add ClickHouse server and examples (https://clickhouse.com/docs/en/tutorial/, https://hub.docker.com/r/clickhouse/clickhouse-server/#!)
 - [ ] Add example notebook using delta-rs python bindings to interact with delta lake
 - [ ] Document a demo walkthrough of steps to do when first starting with project
 - [ ] Develop frontend Vue application to display services in central location
