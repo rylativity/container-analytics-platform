@@ -7,3 +7,5 @@ sqlalchemy
 pandas
 psycopg2
 deltalake
+great_expectations
+trino
