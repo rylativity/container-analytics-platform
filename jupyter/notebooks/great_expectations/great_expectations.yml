@@ -16,20 +16,34 @@ config_version: 3.0
 datasources:
   trino_datasource:
     module_name: great_expectations.datasource
+    data_connectors:
+      default_runtime_data_connector_name:
+        module_name: great_expectations.datasource.data_connector
+        batch_identifiers:
+          - default_identifier_name
+        name: default_runtime_data_connector_name
+        class_name: RuntimeDataConnector
+      default_inferred_data_connector_name:
+        module_name: great_expectations.datasource.data_connector
+        include_schema_name: true
+        name: default_inferred_data_connector_name
+        class_name: InferredAssetSqlDataConnector
     execution_engine:
+      connection_string: trino://trino@trino:8080/delta/my_schema
       module_name: great_expectations.execution_engine
       class_name: SqlAlchemyExecutionEngine
-      connection_string: trino://trino@trino:8080/delta/my_schema
+    class_name: Datasource
+  delta_lake:
+    module_name: great_expectations.datasource
     data_connectors:
       default_runtime_data_connector_name:
         module_name: great_expectations.datasource.data_connector
         batch_identifiers:
           - default_identifier_name
         class_name: RuntimeDataConnector
-      default_inferred_data_connector_name:
-        module_name: great_expectations.datasource.data_connector
-        class_name: InferredAssetSqlDataConnector
-        include_schema_name: true
+    execution_engine:
+      module_name: great_expectations.execution_engine
+      class_name: PandasExecutionEngine
     class_name: Datasource
 config_variables_file_path: uncommitted/config_variables.yml
 
@@ -97,6 +111,6 @@ anonymous_usage_statistics:
   enabled: true
 notebooks:
 include_rendered_content:
-  globally: false
   expectation_validation_result: false
   expectation_suite: false
+  globally: false
