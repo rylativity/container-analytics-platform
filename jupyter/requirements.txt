@@ -8,4 +8,5 @@ pandas
 psycopg2
 deltalake
 great_expectations
+acryl-datahub[great-expectations]
 trino

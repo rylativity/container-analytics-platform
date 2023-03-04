@@ -16,34 +16,35 @@ config_version: 3.0
 datasources:
   trino_datasource:
     class_name: Datasource
-    data_connectors:
-      default_runtime_data_connector_name:
-        class_name: RuntimeDataConnector
-        batch_identifiers:
-          - default_identifier_name
-        module_name: great_expectations.datasource.data_connector
-      default_inferred_data_connector_name:
-        class_name: InferredAssetSqlDataConnector
-        include_schema_name: true
-        module_name: great_expectations.datasource.data_connector
     execution_engine:
-      connection_string: trino://trino@trino:8080/delta/my_schema
       module_name: great_expectations.execution_engine
       class_name: SqlAlchemyExecutionEngine
+      connection_string: trino://trino@trino:8080/delta/my_schema
     module_name: great_expectations.datasource
-  delta_lake:
-    class_name: Datasource
     data_connectors:
       default_runtime_data_connector_name:
-        name: default_runtime_data_connector_name
         class_name: RuntimeDataConnector
+        name: default_runtime_data_connector_name
+        module_name: great_expectations.datasource.data_connector
         batch_identifiers:
           - default_identifier_name
+      default_inferred_data_connector_name:
+        include_schema_name: true
+        class_name: InferredAssetSqlDataConnector
+        name: default_inferred_data_connector_name
         module_name: great_expectations.datasource.data_connector
+  delta_lake:
+    class_name: Datasource
     execution_engine:
       module_name: great_expectations.execution_engine
-      class_name: PandasExecutionEngine
+      class_name: SparkDFExecutionEngine
     module_name: great_expectations.datasource
+    data_connectors:
+      default_runtime_data_connector_name:
+        class_name: RuntimeDataConnector
+        module_name: great_expectations.datasource.data_connector
+        batch_identifiers:
+          - batch_id
 config_variables_file_path: uncommitted/config_variables.yml
 
 # The plugins_directory will be added to your python path for custom modules
@@ -110,6 +111,6 @@ anonymous_usage_statistics:
   data_context_id: e6b82913-03cf-43dd-a1f5-5ec4f8f5a9e8
 notebooks:
 include_rendered_content:
+  globally: false
   expectation_suite: false
   expectation_validation_result: false
-  globally: false
