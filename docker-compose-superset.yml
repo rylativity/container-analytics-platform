@@ -44,11 +44,11 @@ services:
     depends_on: *superset-depends-on
     user: "root"
     volumes: *superset-volumes
-  redis:
-    image: redis:latest
-    restart: unless-stopped
-    volumes:
-      - redis:/data
+  # redis:
+  #   image: redis:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #     - redis:/data
 
 volumes:
   superset_home:

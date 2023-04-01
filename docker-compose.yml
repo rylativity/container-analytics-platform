@@ -22,6 +22,7 @@ services:
     volumes:
       - postgres-db:/var/lib/postgresql/data
       - ./superset/init_supersetdb.sql:/docker-entrypoint-initdb.d/init_supersetdb.sql
+      - ./airflow/init_airflowdb.sql:/docker-entrypoint-initdb.d/init_airflowdb.sql
     healthcheck:
       test: ["CMD", "pg_isready","-U", "hive", "metadata"]
     restart: always
@@ -56,6 +57,20 @@ services:
 
   aws:
     image: amazon/aws-cli
+  
+  redis:
+    image: redis:latest
+    expose:
+      - 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 50
+      start_period: 30s
+    restart: always
+    volumes:
+      - redis-data:/data
   
   # mongo:
   #   image: mongo:6.0
@@ -99,6 +114,7 @@ volumes:
   postgres-db:
   hive-data:
   minio-data:
+  redis-data:
   # elasticsearch_data:
   # mongo_data: 
 
