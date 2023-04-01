@@ -7,6 +7,6 @@ sqlalchemy
 pandas
 psycopg2
 deltalake
-great_expectations
 acryl-datahub[great-expectations]
+great_expectations==0.16.4
 trino
