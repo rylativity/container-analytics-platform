@@ -50,6 +50,8 @@ services:
     build: ./minio # MinioClient image; use it to make buckets and perform any other tasks on startup
     depends_on:
       - minio
+    volumes:
+      - ./data:/data
   trino:
     build: ./trino
     ports:
