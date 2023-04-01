@@ -4,4 +4,4 @@ venv/
 
 *.parq
 *.parquet
-airflow/logs/
+logs/
