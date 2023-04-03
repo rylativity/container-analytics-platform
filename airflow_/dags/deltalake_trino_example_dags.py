@@ -8,10 +8,8 @@ import pandas as pd
 
 
 #### NOTE!!!!!
-## You must create an Airflow connection for Trino before running this dag.
-#  Open http://localhost:8080, login with username:airflow and password:airflow
-# Go to Admin > Connections, and create a new connection with the information below:
-# connection_id=trino_default, host=trino, schema=default, login=trino, port=8080
+## The following DAGs use the Airflow Connection to Trino that is defined as an environment variable in the docker-compose-airflow.yml as AIRFLOW_CONN_TRINO_DEFAULT.
+## The TrinoOperator looks for and uses the connection called `trino_default`
 
 s3_options = {
     "ACCESS_KEY_ID":"airflowaccesskey",

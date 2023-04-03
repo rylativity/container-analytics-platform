@@ -54,6 +54,7 @@ x-airflow-common:
   build: ./airflow_
   environment:
     &airflow-common-env
+    AIRFLOW_CONN_TRINO_DEFAULT: "trino://trino@trino:8080/default"
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     # For backward compatibility, with Airflow <2.3
