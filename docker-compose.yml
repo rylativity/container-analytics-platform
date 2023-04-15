@@ -99,15 +99,14 @@ services:
   #     - 9200:9200
 
   
-  # nginx:
-  #   build: 
-  #     context: ./nginx
-  #     dockerfile: nginx.Dockerfile
-  #   ports: 
-  #     - 80:80
-  #     - 443:443
-  #   healthcheck:
-  #     test: ['CMD', 'curl', '-f', 'http://localhost:80']
+  nginx:
+    build: 
+      context: ./nginx
+    ports: 
+      - 80:80
+      - 443:443
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:80']
   #   restart: always
 
 volumes:
