@@ -109,11 +109,20 @@ services:
       test: ['CMD', 'curl', '-f', 'http://localhost:80']
   #   restart: always
 
+  cloudbeaver:
+    image: dbeaver/cloudbeaver
+    ports:
+     - 8978:8978
+    volumes:
+      - cloudbeaver-data:/opt/cloudbeaver/workspace
+
+
 volumes:
   postgres-db:
   hive-data:
   minio-data:
   redis-data:
+  cloudbeaver-data:
   # elasticsearch_data:
   # mongo_data: 
 
