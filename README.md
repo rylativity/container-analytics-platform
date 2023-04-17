@@ -21,6 +21,8 @@ The docker-compose.yml also defines an ElasticSearch service and a MongoDB servi
 - Minio UI - http://localhost:9090 (user: minio, password: minio123)
 - Trino UI - http://localhost:8080 (user: *any*)
 - Superset UI - http://localhost:8088 (user: admin, password: admin)
+- Datahub UI - http://localhost:9002
+- CloudBeaver UI - http://localhost:8978
 - Trino Shell - `docker-compose exec trino trino` (Use this to run SQL commands against data in Minio)
 *Any host ports can be changed in the docker-compose.yml*
 
@@ -37,6 +39,15 @@ The docker-compose.yml also defines an ElasticSearch service and a MongoDB servi
 ### Delta Lake
 ##### DOCUMENTATION TODO #####
 
+### Nginx
+##### DOCUMENTATION TODO #####
+
+### CloudBeaver
+##### DOCUMENTATION TODO #####
+
+### DataHub
+##### DOCUMENTATION TODO #####
+
 ### Minio
 Minio is an S3-Compatible object store that can be run locally or on any cloud platform.  In other words, Minio is a free, drop-in replacement for S3 that you have full control over.  In addition to countless other uses, Minio is a great standin for S3 while doing local development.
 
@@ -48,8 +59,6 @@ Buckets in the Minio Object Store are programatically accessable at http://local
 
 For example, you can use the AWS CLI v2 to interact with a Minio bucket as if it were an S3 bucket by specifying the endpoint URL.  For example, to list the objects in a **public** Minio bucket called `test`, you would run:
 `aws --endpoint-url http://localhost:9000 s3 ls s3://test/ --no-sign-request`.
-
-
 
 ***
 
@@ -105,29 +114,35 @@ SELECT * FROM delta.my_schema.my_table;
 ```
 
 ## Roadmap
-- [x] Initalize Minio (by creating bucket and adding taxi Parquet data - https://registry.opendata.aws/nyc-tlc-trip-records-pds/) 
+
+### Features and Services
+- [ ] Nginx Configuration for all Services (with 301 redirect for services that don't support base url)
+- [ ] Develop frontend Vue application to display services in central location
+- [ ] Add Minio/S3 schema crawler to crawl buckets and create schemas that can be used to create Hive tables
+- [ ] Develop datahub init process
+- [ ] Develop CloudBeaver init process (https://dbeaver.com/docs/cloudbeaver/Configuring-server-datasources/)
+- [x] Initalize Minio
 - [x] Initialize Trino (by creating a hive table from Parquet taxi data in Minio)
 - [x] Resolve bug in Standalone Metastore (NoSuchObjectException 'hive.<schema>.<table>' no such table) when attempting to create hive table
-- [ ] Add ClickHouse server and examples (https://clickhouse.com/docs/en/tutorial/, https://hub.docker.com/r/clickhouse/clickhouse-server/#!)
-- [ ] Add example notebook using delta-rs python bindings to interact with delta lake
+- [x] Add example notebook using delta-rs python bindings to interact with delta lake
+- [x] Split up docker-compose to create a set of base services (with lower resource usage) and optional add-ons
+- [x] Add Superset to Project for Data Exploration
+- [x] Add Datahub Data Catalog (implemented on branch `datahub`. Is fairly resource intensive, and often requires multiple runs of `docker-compoe up mysql-setup elasticsearch-setup` before `docker-compose up -d`)
+- [x] Add Dynamic FastAPI & Swagger Docs based on Trino Hive tables (created as separate project - https://github.com/rylativity/autoapi)
+- [x] Add Spark+Jupyter & Delta containers and examples
+
+### Documentation
 - [ ] Document a demo walkthrough of steps to do when first starting with project
-- [ ] Develop frontend Vue application to display services in central location
-- [ ] Add reverse proxy (preferably Traefik or NginX) for services
-- [ ] Update README.md with explanation of services and instructions for including datahub, spark, and superset in startup
-- [ ] Split up docker-compose to create a set of base services (with lower resource usage) and optional add-ons
-- [ ] Add detailed usage guides for services
+- [ ] Update README.md with explanation of services and instructions for including datahub, spark, and superset in startup- [ ] Add detailed usage guides for services
   - [ ] Jupyter
+  - [ ] CloudBeaver
   - [ ] Spark
   - [ ] Delta Lake
   - [ ] DataHub
+  - [ ] Nginx
   - [ ] Add Screenshots
 - [ ] Update README.md with instructions for using example data & init scripts
-- [x] Add Superset to Project for Data Exploration
-- [x] Add Datahub Data Catalog (implemented on branch `datahub`. Is fairly resource intensive, and often requires multiple runs of `docker-compoe up mysql-setup elasticsearch-setup` before `docker-compose up -d`)
-- [ ] Build out datahub automated startup process
-- [x] Add Dynamic FastAPI & Swagger Docs based on Trino Hive tables (created as separate project - https://github.com/rylativity/autoapi)
-- [ ] Add Minio/S3 schema crawler to crawl buckets and create schemas that can be used to create Hive tables
-- [x] Add Spark+Jupyter & Delta containers and examples
+
 
 ## Troubleshooting
 - While you can have multiple Trino catalog connectors of type hive and delta, schema names must be globally unique (i.e. a schema name defined in a hive connection cannot be used in a delta connection)
