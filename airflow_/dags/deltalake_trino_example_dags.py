@@ -1,8 +1,9 @@
-from airflow import Dataset
+# from airflow import Dataset
 from airflow.decorators import task, dag
 from airflow.providers.trino.operators.trino import TrinoOperator
 from datetime import datetime
 
+from datahub_provider.entities import Dataset, Urn
 from deltalake.writer import write_deltalake
 import pandas as pd
 
@@ -25,7 +26,7 @@ TRINO_SCHEMA = "my_schema"
 TRINO_TABLE = "appl_stock_delta_table"
 MINIO_BUCKET = "s3a://test/"
 
-example_dataset = Dataset(f"{MINIO_BUCKET}{TRINO_TABLE}")
+#example_dataset = Dataset(f"{MINIO_BUCKET}{TRINO_TABLE}")
 
 @dag(
     dag_id="create_and_register_delta_table",
@@ -57,14 +58,16 @@ def create_deltalake_table():
         CALL {TRINO_DB}.system.register_table(schema_name => '{TRINO_SCHEMA}', table_name => '{TRINO_TABLE}', table_location => '{MINIO_BUCKET}{TRINO_TABLE}')
         """,
         handler=list,
-        outlets=[example_dataset]
+        outlets = [
+            Dataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}")
+        ]
     )
 
     deltalake_create_table() >> trino_create_schema >> trino_register_delta_table
 
 @dag(
     dag_id="trino_create_delta_table",
-    schedule=[example_dataset],  # Override to match your needs
+    schedule="@once",  # Override to match your needs
     start_date=datetime(2022, 1, 1),
     catchup=False,
     tags=["example"],
@@ -78,7 +81,10 @@ def create_table_trino():
         sql=f"""CREATE TABLE IF NOT EXISTS {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}_VERSION_2 AS(
         SELECT * FROM {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}
         )""",
-        handler=list
+        handler=list,
+        outlets = [
+            Dataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}_VERSION_2")
+        ]
     )
 
 
