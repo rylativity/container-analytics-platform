@@ -1,0 +1,38 @@
+name: test_checkpoint
+config_version: 1.0
+template_name:
+module_name: great_expectations.checkpoint
+class_name: Checkpoint
+run_name_template:
+expectation_suite_name:
+batch_request: {}
+action_list:
+  - name: store_validation_result
+    action:
+      class_name: StoreValidationResultAction
+  - name: store_evaluation_params
+    action:
+      class_name: StoreEvaluationParametersAction
+  - name: update_data_docs
+    action:
+      class_name: UpdateDataDocsAction
+      site_names: []
+evaluation_parameters: {}
+runtime_configuration: {}
+validations:
+  - action_list:
+      - name: datahub_action
+        action:
+          module_name: datahub.integrations.great_expectations.action
+          class_name: DataHubValidationAction
+          server_url: http://datahub-gms:8080
+    batch_request:
+      datasource_name: trino_datasource
+      data_connector_name: default_inferred_data_connector_name
+      data_asset_name: my_schema.appl_stock_delta_table
+      data_connector_query:
+        index: -1
+    expectation_suite_name: test_suite
+profilers: []
+ge_cloud_id:
+expectation_suite_ge_cloud_id:

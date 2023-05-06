@@ -2,4 +2,6 @@ apache-airflow[celery]==2.5.3 --constraint "https://raw.githubusercontent.com/ap
 apache-airflow-providers-trino[common.sql]
 deltalake
 acryl-datahub[airflow]
+acryl-datahub[great-expectations]
 acryl-datahub-airflow-plugin
+airflow-provider-great-expectations==0.2.0
