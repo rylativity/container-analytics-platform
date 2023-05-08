@@ -10,3 +10,4 @@ deltalake
 acryl-datahub[great-expectations]
 great_expectations==0.16.4
 trino
+boto3
