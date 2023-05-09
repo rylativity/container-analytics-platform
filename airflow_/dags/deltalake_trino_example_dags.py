@@ -1,9 +1,9 @@
-# from airflow import Dataset
+from airflow import Dataset as AirflowDataset
 from airflow.decorators import task, dag
 from airflow.providers.trino.operators.trino import TrinoOperator
 from datetime import datetime
 
-from datahub_provider.entities import Dataset, Urn
+from datahub_provider.entities import Dataset as DatahubDataset
 from deltalake.writer import write_deltalake
 import pandas as pd
 
@@ -26,8 +26,8 @@ TRINO_SCHEMA = "my_schema"
 TRINO_TABLE = "appl_stock_delta_table"
 MINIO_BUCKET = "s3a://test/"
 
-#example_dataset = Dataset(f"{MINIO_BUCKET}{TRINO_TABLE}")
-example_dataset = Dataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}")
+airflow_dataset = AirflowDataset(f"{MINIO_BUCKET}{TRINO_TABLE}")
+datahub_dataset = DatahubDataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}")
 
 @dag(
     dag_id="create_and_register_delta_table",
@@ -69,7 +69,8 @@ def create_deltalake_table():
         """,
         handler=list,
         outlets = [
-            example_dataset
+            datahub_dataset,
+            airflow_dataset
         ]
     )
 
@@ -77,7 +78,7 @@ def create_deltalake_table():
 
 @dag(
     dag_id="trino_create_delta_table",
-    schedule="@once",  # Override to match your needs
+    schedule=[airflow_dataset],  # Override to match your needs
     start_date=datetime(2022, 1, 1),
     catchup=False,
     tags=["example"],
@@ -101,9 +102,9 @@ def create_table_trino():
         SELECT * FROM {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}
         )""",
         handler=list,
-        inlets=[example_dataset],
+        inlets=[datahub_dataset],
         outlets = [
-            Dataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}_VERSION_2")
+            DatahubDataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}_VERSION_2")
         ]
     )
 
