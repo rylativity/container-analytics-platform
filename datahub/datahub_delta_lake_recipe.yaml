@@ -2,7 +2,7 @@ source:
   type: delta-lake
   config:
     env: PROD
-    base_path: 's3://test/'
+    base_path: 's3://test'
     s3:
       aws_config:
         aws_endpoint_url: 'http://minio:9000'

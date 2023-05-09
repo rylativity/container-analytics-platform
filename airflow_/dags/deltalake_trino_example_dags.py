@@ -38,6 +38,15 @@ MINIO_BUCKET = "s3a://test/"
 def create_deltalake_table():
 
     ## Create a Delta Lake Table from CSV Using The Delta-RS Library
+
+    trino_drop_table = TrinoOperator(
+        task_id="trino_drop_table",
+        sql=f"""DROP TABLE IF EXISTS {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE} 
+        """,
+        handler=list,
+
+    )
+
     @task()
     def deltalake_create_table():
         df = pd.read_csv("/data/appl_stock.csv")
@@ -63,7 +72,7 @@ def create_deltalake_table():
         ]
     )
 
-    deltalake_create_table() >> trino_create_schema >> trino_register_delta_table
+    trino_drop_table >> deltalake_create_table() >> trino_create_schema >> trino_register_delta_table
 
 @dag(
     dag_id="trino_create_delta_table",
@@ -76,6 +85,15 @@ def create_table_trino():
 
     ## This task will fail unless you create the source delta.my_schema.appl_stock_delta_table. 
     # You can create this table by going to http://localhost:8888 and running the `pyspark_delta_example.ipynb` notebook
+
+    trino_drop_table = TrinoOperator(
+        task_id="trino_drop_table",
+        sql=f"""DROP TABLE IF EXISTS {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}_VERSION_2
+        """,
+        handler=list,
+
+    )
+
     trino_create_table = TrinoOperator(
         task_id="trino_create_table",
         sql=f"""CREATE TABLE IF NOT EXISTS {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}_VERSION_2 AS(
