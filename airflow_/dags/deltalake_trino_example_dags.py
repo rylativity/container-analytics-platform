@@ -27,6 +27,7 @@ TRINO_TABLE = "appl_stock_delta_table"
 MINIO_BUCKET = "s3a://test/"
 
 #example_dataset = Dataset(f"{MINIO_BUCKET}{TRINO_TABLE}")
+example_dataset = Dataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}")
 
 @dag(
     dag_id="create_and_register_delta_table",
@@ -68,7 +69,7 @@ def create_deltalake_table():
         """,
         handler=list,
         outlets = [
-            Dataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}")
+            example_dataset
         ]
     )
 
@@ -100,6 +101,7 @@ def create_table_trino():
         SELECT * FROM {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}
         )""",
         handler=list,
+        inlets=[example_dataset],
         outlets = [
             Dataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}_VERSION_2")
         ]
