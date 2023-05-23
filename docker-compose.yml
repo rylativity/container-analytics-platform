@@ -53,10 +53,10 @@ services:
       - minio
     volumes:
       - ./data:/data
-  # trino:
-  #   build: ./trino
-  #   ports:
-  #     - 8880:8080
+  trino:
+    build: ./trino
+    ports:
+      - 8880:8080
   
   dremio:
     image: dremio/dremio-oss
@@ -137,12 +137,12 @@ services:
   #     test: ['CMD', 'curl', '-f', 'http://localhost:80']
   # #   restart: always
 
-  # cloudbeaver:
-  #   image: dbeaver/cloudbeaver
-  #   ports:
-  #    - 8978:8978
-  #   volumes:
-  #     - cloudbeaver-data:/opt/cloudbeaver/workspace
+  cloudbeaver:
+    image: dbeaver/cloudbeaver
+    ports:
+     - 8978:8978
+    volumes:
+      - cloudbeaver-data:/opt/cloudbeaver/workspace
 
 
 volumes:
@@ -151,7 +151,7 @@ volumes:
   minio-data:
   redis-data:
   dremio-data:
-  # cloudbeaver-data:
+  cloudbeaver-data:
   # elasticsearch_data:
   # mongo_data: 
 
