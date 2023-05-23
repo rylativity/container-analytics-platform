@@ -1,6 +1,19 @@
-FROM bitnami/spark:3.3.0
-ARG DELTA_LAKE_VERSION=2.1.0
-ARG DELTA_CORE_VERSION=2.12
-ARG FULL_VERSION=${DELTA_CORE_VERSION}-${DELTA_LAKE_VERSION}
+FROM openjdk:11
 
-ADD https://repo1.maven.org/maven2/io/delta/delta-core_${DELTA_CORE_VERSION}/${DELTA_LAKE_VERSION}/delta-core_${FULL_VERSION}.jar /opt/bitnami/spark/jars/delta-core_${FULL_VERSION}.jar
+ENV SPARK_VERSION=3.3.2
+ENV SPARK_MAJOR_VERSION=3
+ENV SPARK_MINOR_VERSION=3.3
+ENV AWS_SDK_VERSION=2.20.64
+ENV SCALA_VERSION=2.12
+ENV ICEBERG_VERSION=1.2.1
+ENV SPARK_HOME=/opt/spark
+
+RUN apt-get update && apt-get install -y curl mlocate dumb-init
+
+RUN curl -L https://dlcdn.apache.org/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${SPARK_MAJOR_VERSION}.tgz --output ./spark-${SPARK_VERSION}-bin-hadoop${SPARK_MAJOR_VERSION}.tgz && \
+    tar zxvf ./spark-${SPARK_VERSION}-bin-hadoop${SPARK_MAJOR_VERSION}.tgz && mv spark-${SPARK_VERSION}-bin-hadoop${SPARK_MAJOR_VERSION} ${SPARK_HOME} && \
+    rm -f ./spark-${SPARK_VERSION}-bin-hadoop${SPARK_MAJOR_VERSION}.tgz
+
+ENV PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+
+ENV SPARK_MASTER_IP=0.0.0.0

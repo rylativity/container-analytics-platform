@@ -1,29 +1,40 @@
 version: '3.9'
-
-services:
-  spark:
-    build: ./spark
-    environment:
-      - SPARK_MODE=master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-    ports:
-      - '8090:8080'
-      - '7077:7077'
-    volumes:
-      - ./data:/data
-  spark-worker:
-    build: ./spark
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark:7077
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=1
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-    volumes:
-      - ./data:/data
+spark:
+  build: ./spark
+  command: ["spark-class", "org.apache.spark.deploy.master.Master"]
+  environment:
+    - SPARK_WORKER_MEMORY=8g
+    - POSTGRES_USER=iceberg
+    - POSTGRES_PASSWORD=iceberg
+    - POSTGRES_HOST=postgres
+    - AWS_ACCESS_KEY_ID=sparkaccesskey
+    - AWS_SECRET_ACCESS_KEY=sparksupersecretkey
+    - AWS_REGION=us-east-1
+    - AWS_ENDPOINT_URL=http://minio:9000
+    - PYSPARK_PYTHON=python3
+    - PYSPARK_DRIVER_PYTHON=python3
+    - SPARK_YARN_USER_ENV="PYSPARK_PYTHON=python3"
+  ports:
+    - '8099:8080'
+    - '7077:7077'
+  volumes:
+    - ./data:/data
+spark-worker:
+  build: ./spark
+  command: ["spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark:7077"]
+  environment:
+    - SPARK_WORKER_MEMORY=8g
+    - POSTGRES_USER=iceberg
+    - POSTGRES_PASSWORD=iceberg
+    - POSTGRES_HOST=postgres
+    - AWS_ACCESS_KEY_ID=sparkaccesskey
+    - AWS_SECRET_ACCESS_KEY=sparksupersecretkey
+    - AWS_REGION=us-east-1
+    - AWS_ENDPOINT_URL=http://minio:9000
+    - PYSPARK_PYTHON=python3
+    - PYSPARK_DRIVER_PYTHON=python3
+    - SPARK_YARN_USER_ENV="PYSPARK_PYTHON=python3"
+  volumes:
+    - ./data:/data
+  ports:
+    - 8098:8081

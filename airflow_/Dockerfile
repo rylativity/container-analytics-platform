@@ -1,5 +1,9 @@
 FROM apache/airflow:2.5.3-python3.10
 
+USER root 
+
+RUN apt-get update && apt-get install -y openjdk-11-jdk && rm -rf /var/lib/apt/lists
+
 COPY requirements.txt .
 
 RUN pip install -r requirements.txt
