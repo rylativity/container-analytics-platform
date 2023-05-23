@@ -4,23 +4,23 @@ trino:
     dev:
       type: trino
       method: none  # optional, one of {none | ldap | kerberos}
-      user: [dev_user]
+      user: trino
       password: [password]  # required if method is ldap or kerberos
-      database: [database name]
-      host: [hostname]
-      port: [port number]
-      schema: [dev_schema]
-      threads: [1 or more]
+      database: delta
+      host: trino
+      port: 8080
+      schema: my_schema
+      threads: 1
 
-    prod:
-      type: trino
-      method: none  # optional, one of {none | ldap | kerberos}
-      user: [prod_user]
-      password: [prod_password]  # required if method is ldap or kerberos
-      database: [database name]
-      host: [hostname]
-      port: [port number]
-      schema: [prod_schema]
-      threads: [1 or more]
+    # prod:
+    #   type: trino
+    #   method: none  # optional, one of {none | ldap | kerberos}
+    #   user: [prod_user]
+    #   password: [prod_password]  # required if method is ldap or kerberos
+    #   database: [database name]
+    #   host: [hostname]
+    #   port: [port number]
+    #   schema: [prod_schema]
+    #   threads: [1 or more]
 
   target: dev

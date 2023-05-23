@@ -4,7 +4,7 @@ my_project:
       dremio_space: 'dbt'
       dremio_space_folder: no_schema
       object_storage_source: minio
-      object_storage_path: warehouse.dbt
+      object_storage_path: test.dbt
       password: dremio123
       port: 9047
       software_host: dremio

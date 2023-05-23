@@ -1,13 +1,7 @@
-with customers as (
+with appl_stock_dbt as (
 
-    select
-        UserId as customer_id,
-        total_spend,
-        avg_spend_per_transaction,
-        total_items_purchased,
-        distinct_items_purchased
-
-    from minio.warehouse.gold.transaction_data
+    select *
+    from delta.my_schema.appl_stock_delta_table
 
 )
 -- ,
@@ -43,4 +37,4 @@ with customers as (
 
 -- )
 
-select * from customers
+select * from appl_stock_dbt
