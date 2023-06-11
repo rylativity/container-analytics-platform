@@ -63,8 +63,8 @@
         <value>org.apache.hadoop.hive.metastore.DefaultPartitionExpressionProxy</value>
     </property>
     <property>
-        <name>metastore.warehouse.dir</name>
-        <value>/opt/warehouse</value>
+        <name>hive.metastore.warehouse.dir</name>
+        <value>s3a://test/warehouse</value>
     </property>
     <property>
         <name>hive.metastore.client.socket.timeout</name>
