@@ -1,0 +1,23 @@
+
+version: 2
+
+models:
+  - name: transactions_bronze
+    description: "Raw transaction data"
+    columns:
+      - name: TransactionId
+        description: "The primary key for this table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('transactions_silver')
+              field: TransactionId
+
+  - name: transactions_silver
+    description: "Cleaned transaction data"
+    columns:
+      - name: TransactionId
+        description: "The primary key for this table"
+        tests:
+          - not_null
+          

@@ -81,7 +81,7 @@ services:
 
   dbt:
     build: ./dbt
-    # entrypoint: ''
+    entrypoint: ["/bin/bash", "-c"]
     volumes:
       - ./dbt/project/:/usr/app/
       - ./dbt/dot-dbt/:/root/.dbt/
