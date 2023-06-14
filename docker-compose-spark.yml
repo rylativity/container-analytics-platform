@@ -1,40 +1,35 @@
 version: '3.9'
-spark:
-  build: ./spark
-  command: ["spark-class", "org.apache.spark.deploy.master.Master"]
-  environment:
-    - SPARK_WORKER_MEMORY=8g
-    - POSTGRES_USER=iceberg
-    - POSTGRES_PASSWORD=iceberg
-    - POSTGRES_HOST=postgres
-    - AWS_ACCESS_KEY_ID=sparkaccesskey
-    - AWS_SECRET_ACCESS_KEY=sparksupersecretkey
-    - AWS_REGION=us-east-1
-    - AWS_ENDPOINT_URL=http://minio:9000
-    - PYSPARK_PYTHON=python3
-    - PYSPARK_DRIVER_PYTHON=python3
-    - SPARK_YARN_USER_ENV="PYSPARK_PYTHON=python3"
-  ports:
-    - '8099:8080'
-    - '7077:7077'
-  volumes:
-    - ./data:/data
-spark-worker:
-  build: ./spark
-  command: ["spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark:7077"]
-  environment:
-    - SPARK_WORKER_MEMORY=8g
-    - POSTGRES_USER=iceberg
-    - POSTGRES_PASSWORD=iceberg
-    - POSTGRES_HOST=postgres
-    - AWS_ACCESS_KEY_ID=sparkaccesskey
-    - AWS_SECRET_ACCESS_KEY=sparksupersecretkey
-    - AWS_REGION=us-east-1
-    - AWS_ENDPOINT_URL=http://minio:9000
-    - PYSPARK_PYTHON=python3
-    - PYSPARK_DRIVER_PYTHON=python3
-    - SPARK_YARN_USER_ENV="PYSPARK_PYTHON=python3"
-  volumes:
-    - ./data:/data
-  ports:
-    - 8098:8081
+services:
+  spark:
+    build: ./spark
+    command: ["spark-class", "org.apache.spark.deploy.master.Master"]
+    environment:
+      - SPARK_WORKER_MEMORY=8g
+      - AWS_ACCESS_KEY_ID=sparkaccesskey
+      - AWS_SECRET_ACCESS_KEY=sparksupersecretkey
+      - AWS_REGION=us-east-1
+      - AWS_ENDPOINT_URL=http://minio:9000
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=python3
+      - SPARK_YARN_USER_ENV="PYSPARK_PYTHON=python3"
+    ports:
+      - '8099:8080'
+      - '7077:7077'
+    volumes:
+      - ./data:/data
+  spark-worker:
+    build: ./spark
+    command: ["spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark:7077"]
+    environment:
+      - SPARK_WORKER_MEMORY=8g
+      - AWS_ACCESS_KEY_ID=sparkaccesskey
+      - AWS_SECRET_ACCESS_KEY=sparksupersecretkey
+      - AWS_REGION=us-east-1
+      - AWS_ENDPOINT_URL=http://minio:9000
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=python3
+      - SPARK_YARN_USER_ENV="PYSPARK_PYTHON=python3"
+    volumes:
+      - ./data:/data
+    ports:
+      - 8098:8081
