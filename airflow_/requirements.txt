@@ -5,6 +5,7 @@ acryl-datahub[airflow]
 acryl-datahub[great-expectations]
 acryl-datahub-airflow-plugin
 airflow-provider-great-expectations==0.2.0
-dbt-dremio
 pyspark==3.3.2
 apache-airflow-providers-apache-spark
+# dbt-dremio
+dbt-trino
