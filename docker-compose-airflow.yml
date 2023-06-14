@@ -57,6 +57,7 @@ x-airflow-common:
     AIRFLOW_UID: ${AIRFLOW_UID:-50000}
     AIRFLOW_CONN_TRINO_DEFAULT: "trino://trino@trino:8080/default"
     AIRFLOW_CONN_DATAHUB_REST_DEFAULT: '{"conn_type":"http","host":"http://datahub-gms:8080"}'
+    AIRFLOW_CONN_SPARK_DEFAULT: '{"conn_type":"http","host":"spark://spark:7077"}'
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     # For backward compatibility, with Airflow <2.3
