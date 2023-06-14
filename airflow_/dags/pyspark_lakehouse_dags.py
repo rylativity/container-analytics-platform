@@ -13,9 +13,12 @@ SOURCE_CSV_DATA_PATH = f"s3a://test/transaction_data.csv"
 
 BUCKET = "warehouse"
 TABLE_NAME = "transaction_data"
-BRONZE_TABLE_PATH = f"s3a://{BUCKET}/bronze/{TABLE_NAME}"
-SILVER_TABLE_PATH = f"s3a://{BUCKET}/silver/{TABLE_NAME}"
-GOLD_TABLE_PATH = f"s3a://{BUCKET}/gold/{TABLE_NAME}"
+BRONZE_TABLE_PATH = f"s3a://{BUCKET}/spark/bronze/{TABLE_NAME}"
+SILVER_TABLE_PATH = f"s3a://{BUCKET}/spark/silver/{TABLE_NAME}"
+GOLD_TABLE_PATH = f"s3a://{BUCKET}/spark/gold/{TABLE_NAME}"
+
+spark_packages = 'org.apache.hadoop:hadoop-aws:3.3.2,io.delta:delta-core_2.12:2.1.0'
+
 
 @dag(
     schedule=None,
@@ -32,14 +35,12 @@ def load_bronze_table():
     located
     [here](https://airflow.apache.org/docs/apache-airflow/stable/tutorial_taskflow_api.html)
     """
-
-    packages = 'org.apache.hadoop:hadoop-aws:3.3.2,io.delta:delta-core_2.12:2.1.0'
     
-    log.warn(f"Using Packages - {packages}")
+    log.warn(f"Using Packages - {spark_packages}")
     
     spark_load_job = SparkSubmitOperator(
         application="/opt/airflow/dags/pyspark_apps/load_bronze_table_app.py", task_id="load_bronze_table",
-        packages=packages,
+        packages=spark_packages,
         # env_vars={},
         application_args=[f"--input-path={SOURCE_CSV_DATA_PATH}", f"--output-path={BRONZE_TABLE_PATH}"],
         inlets=[Dataset(SOURCE_CSV_DATA_PATH)],
@@ -62,14 +63,12 @@ def clean_and_load_silver_table():
     located
     [here](https://airflow.apache.org/docs/apache-airflow/stable/tutorial_taskflow_api.html)
     """
-
-    packages = 'org.apache.hadoop:hadoop-aws:3.3.2,io.delta:delta-core_2.12:2.1.0'
     
-    log.warn(f"Using Packages - {packages}")
+    log.warn(f"Using Packages - {spark_packages}")
     
     spark_load_job = SparkSubmitOperator(
         application="/opt/airflow/dags/pyspark_apps/clean_and_load_silver_table_app.py", task_id="clean_and_load_silver_table",
-        packages=packages,
+        packages=spark_packages,
         env_vars={},
         application_args=[f"--input-path={BRONZE_TABLE_PATH}", f"--output-path={SILVER_TABLE_PATH}"],
         outlets=[Dataset(SILVER_TABLE_PATH)]
@@ -91,14 +90,12 @@ def process_and_load_gold_table():
     located
     [here](https://airflow.apache.org/docs/apache-airflow/stable/tutorial_taskflow_api.html)
     """
-
-    packages = 'org.apache.hadoop:hadoop-aws:3.3.2,io.delta:delta-core_2.12:2.1.0'
     
-    log.warn(f"Using Packages - {packages}")
+    log.warn(f"Using Packages - {spark_packages}")
     
     spark_load_job = SparkSubmitOperator(
         application="/opt/airflow/dags/pyspark_apps/process_and_load_gold_table_app.py", task_id="process_and_load_gold_table",
-        packages=packages,
+        packages=spark_packages,
         # env_vars={},
         application_args=[f"--input-path={SILVER_TABLE_PATH}", f"--output-path={GOLD_TABLE_PATH}"],
         outlets=[Dataset(GOLD_TABLE_PATH)]

@@ -35,7 +35,7 @@ sc = pyspark.SparkContext(conf=conf)
 
 spark = pyspark.sql.SparkSession(sc)
 
-    df = spark.read.format("delta").load(SILVER_TABLE_PATH)
+df = spark.read.format("delta").load(SILVER_TABLE_PATH)
 
 
 ## DATA AGGREGATION BY CUSTOMERID BELOW

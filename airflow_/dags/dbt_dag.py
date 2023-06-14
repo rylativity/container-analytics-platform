@@ -15,9 +15,9 @@ DBT_PROFILES_YAML_FILE = "/opt/airflow/dags/dbt_/project/profiles.yml"
 )
 def dbt_dag():
 
-    dbt_run = BashOperator(
-        task_id="dbt_run",
-        bash_command=f"cd {DBT_PROJECT_DIR} && dbt run --profiles-dir {os.path.dirname(DBT_PROFILES_YAML_FILE)}"
+    dbt_task = BashOperator(
+        task_id="dbt_task",
+        bash_command=f"dbt build --project-dir {DBT_PROJECT_DIR} --profiles-dir {os.path.dirname(DBT_PROFILES_YAML_FILE)}"
     )
 
 dbt_dag()

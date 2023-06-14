@@ -34,7 +34,7 @@ sc = pyspark.SparkContext(conf=conf)
 
 spark = pyspark.sql.SparkSession(sc)
 
-    df = spark.read.option("header", "true").csv(SOURCE_CSV_TABLE_PATH)
+df = spark.read.option("header", "true").csv(SOURCE_CSV_TABLE_PATH)
 
 
 df.write.format("delta").save(BRONZE_TABLE_PATH, mode="overwrite")

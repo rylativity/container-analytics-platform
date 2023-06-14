@@ -36,13 +36,13 @@ sc = pyspark.SparkContext(conf=conf)
 
 spark = pyspark.sql.SparkSession(sc)
 
-    df = spark.read.format("delta").load(BRONZE_TABLE_PATH)
+df = spark.read.format("delta").load(BRONZE_TABLE_PATH)
 
 
 ## DO SOME CLEANING TO df
 df = df.withColumn("UserId",df.UserId.cast('string'))
 df = df.replace("-1", "Unknown", ["UserId"])
-df = df.withColumn("TransactionTime", F.to_timestamp(df.TransactionTime, "E MMM dd HH:mm:ss z yyyy"))
+df = df.withColumn("TransactionTime", F.to_timestamp(df.TransactionTime, "yyyy-MM-dd HH:mm:ss"))
 df = df.withColumn("NumberOfItemsPurchased", df.NumberOfItemsPurchased.cast("int"))
 df = df.withColumn("CostPerItem", df.CostPerItem.cast("double"))
 
