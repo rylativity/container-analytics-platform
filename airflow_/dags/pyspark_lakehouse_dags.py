@@ -17,7 +17,7 @@ BRONZE_TABLE_PATH = f"s3a://{BUCKET}/spark/bronze/{TABLE_NAME}"
 SILVER_TABLE_PATH = f"s3a://{BUCKET}/spark/silver/{TABLE_NAME}"
 GOLD_TABLE_PATH = f"s3a://{BUCKET}/spark/gold/{TABLE_NAME}"
 
-spark_packages = 'org.apache.hadoop:hadoop-aws:3.3.2,io.delta:delta-core_2.12:2.1.0'
+spark_packages = 'org.apache.hadoop:hadoop-aws:3.3.3,io.delta:delta-core_2.12:2.1.0'
 
 
 @dag(

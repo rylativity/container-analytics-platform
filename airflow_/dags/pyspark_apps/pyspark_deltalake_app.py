@@ -10,7 +10,7 @@ S3_BUCKET = "warehouse"
 # def write_deltalake_table():
 conf = pyspark.SparkConf()
 conf.setMaster("spark://spark:7077")
-conf.set("spark.jars.packages", 'org.apache.hadoop:hadoop-aws:3.3.2,io.delta:delta-core_2.12:2.1.0')
+conf.set("spark.jars.packages", 'org.apache.hadoop:hadoop-aws:3.3.3,io.delta:delta-core_2.12:2.1.0')
 # conf.set('spark.hadoop.fs.s3a.aws.credentials.provider', 'org.apache.hadoop.fs.s3a.AnonymousAWSCredentialsProvider')
 conf.set('spark.hadoop.fs.s3a.endpoint', S3_ENDPOINT)
 conf.set('spark.hadoop.fs.s3a.access.key', S3_ACCESS_KEY)

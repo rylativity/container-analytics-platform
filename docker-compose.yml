@@ -25,7 +25,7 @@ services:
       - ./airflow_/init_airflowdb.sql:/docker-entrypoint-initdb.d/init_airflowdb.sql
       - ./metastore/init_metastoredb.sql:/docker-entrypoint-initdb.d/init_metastoredb.sql
     healthcheck:
-      test: ["CMD", "pg_isready","-U", "postgres", "postgres"]
+      test: ["CMD", "pg_isready","-U", "postgres"]
     restart: always
   metastore:
     build: ./metastore
@@ -58,33 +58,33 @@ services:
     ports:
       - 8880:8080
   
-  dremio:
-    image: dremio/dremio-oss
-    ports:
-      - 9047:9047
-    volumes:
-      - dremio-data:/opt/dremio/data/
+  # dremio:
+  #   image: dremio/dremio-oss
+  #   ports:
+  #     - 9047:9047
+  #   volumes:
+  #     - dremio-data:/opt/dremio/data/
   
-  dremio-init:
-    image: curlimages/curl
-    entrypoint: ["/bin/sh"]
-    command: 
-      - -c
-      - | 
-        until curl -s -f -o /dev/null "http://dremio:9047/live"
-        do
-          sleep 5
-        done
-        curl http://dremio:9047/apiv2/bootstrap/firstuser -X PUT -H 'Authorization: _dremionull' -H 'Content-Type: application/json' -d '{ 
-        "userName":"dremio","firstName":"dremio","lastName":"dremio","email":"dremio@example.com","createdAt":1526186430755,"password":"dremio123"
-        }'
+  # dremio-init:
+  #   image: curlimages/curl
+  #   entrypoint: ["/bin/sh"]
+  #   command: 
+  #     - -c
+  #     - | 
+  #       until curl -s -f -o /dev/null "http://dremio:9047/live"
+  #       do
+  #         sleep 5
+  #       done
+  #       curl http://dremio:9047/apiv2/bootstrap/firstuser -X PUT -H 'Authorization: _dremionull' -H 'Content-Type: application/json' -d '{ 
+  #       "userName":"dremio","firstName":"dremio","lastName":"dremio","email":"dremio@example.com","createdAt":1526186430755,"password":"dremio123"
+  #       }'
 
-  dbt:
-    build: ./dbt
-    entrypoint: ["/bin/bash", "-c"]
-    volumes:
-      - ./dbt/project/:/usr/app/dbt/
-      - ./dbt/dot-dbt/:/root/.dbt/
+  # dbt:
+  #   build: ./dbt
+  #   entrypoint: ["/bin/bash", "-c"]
+  #   volumes:
+  #     - ./dbt/project/:/usr/app/dbt/
+  #     - ./dbt/dot-dbt/:/root/.dbt/
   
   redis:
     image: redis:latest
@@ -137,12 +137,12 @@ services:
   #     test: ['CMD', 'curl', '-f', 'http://localhost:80']
   # #   restart: always
 
-  cloudbeaver:
-    image: dbeaver/cloudbeaver
-    ports:
-     - 8978:8978
-    volumes:
-      - cloudbeaver-data:/opt/cloudbeaver/workspace
+  # cloudbeaver:
+  #   image: dbeaver/cloudbeaver
+  #   ports:
+  #    - 8978:8978
+  #   volumes:
+  #     - cloudbeaver-data:/opt/cloudbeaver/workspace
 
 
 volumes:

@@ -18,7 +18,7 @@ S3_ENDPOINT = os.environ.get("S3_ENDPOINT")
 # S3_ENDPOINT = "http://minio:9000"
 
 conf = pyspark.SparkConf().setMaster("spark://spark:7077")
-conf.set("spark.jars.packages", 'org.apache.hadoop:hadoop-aws:3.3.1,io.delta:delta-core_2.12:2.1.0')
+conf.set("spark.jars.packages", 'org.apache.hadoop:hadoop-aws:3.3.3,io.delta:delta-core_2.12:2.1.0')
 # conf.set('spark.hadoop.fs.s3a.aws.credentials.provider', 'org.apache.hadoop.fs.s3a.AnonymousAWSCredentialsProvider')
 conf.set('spark.hadoop.fs.s3a.endpoint', S3_ENDPOINT)
 conf.set('spark.hadoop.fs.s3a.access.key', S3_ACCESS_KEY)

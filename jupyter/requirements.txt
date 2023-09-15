@@ -1,12 +1,8 @@
-pyspark==3.3.0
+pyspark==3.3.3
 delta-spark==2.1.0
-elasticsearch
-pymongo
 faker
 sqlalchemy
 pandas
 psycopg2
 deltalake
-acryl-datahub[great-expectations]
-great_expectations==0.16.4
 trino

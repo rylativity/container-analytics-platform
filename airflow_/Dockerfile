@@ -1,4 +1,4 @@
-FROM apache/airflow:2.5.3-python3.9
+FROM apache/airflow:2.7.1-python3.9
 
 USER root 
 
@@ -10,4 +10,4 @@ COPY requirements.txt .
 
 RUN pip install -r requirements.txt
 
-COPY airflow.cfg /opt/airflow/airflow.cfg
+# COPY airflow.cfg /opt/airflow/airflow.cfg
