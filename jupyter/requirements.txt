@@ -1,3 +1,4 @@
+jupyterlab
 pyspark==3.3.3
 delta-spark==2.1.0
 faker

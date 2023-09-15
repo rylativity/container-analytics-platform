@@ -1,7 +1,6 @@
 FROM python:3-bullseye
 
-RUN apt-get update && apt-get install -y openjdk-11-jdk &&\
-    pip install jupyterlab
+RUN apt-get update && apt-get install -y openjdk-11-jdk
 
 COPY ./requirements.txt .
 
