@@ -16,8 +16,8 @@ s3_options = {
     "ACCESS_KEY_ID":"airflowaccesskey",
     "SECRET_ACCESS_KEY":"airflowsupersecretkey",
     "ENDPOINT":"http://minio:9000",
-    "REGION":"us-east",
-    "AWS_STORAGE_ALLOW_HTTP": "true",
+    "REGION":"us-east-1",
+    "AWS_ALLOW_HTTP": "true",
     "AWS_S3_ALLOW_UNSAFE_RENAME":"true"
 }
 
