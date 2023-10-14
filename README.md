@@ -2,31 +2,57 @@
 
 ### Note: This README is slightly out-of-date as changes to this repo are relatively frequent. Updates to README are in progress.
 
-This project contains all configuration files needed to set up a modern, distributed, containerized analytics environment, allowing you to query data where it lies (in this case, in a S3 object store, in ElasticSearch, and in MongoDB). The docker-compose.yml file defines the following services: a Postgres container (backend for Hive Metastore), a Hive Metastore Container, a Minio Container (which you can use as a drop-in replacement for AWS S3) for testing the Hive metastore on an Object Store, a Trino container for querying data out of S3(Minio) using the Hive Metastore, and the four services that make up Superset for dashboarding data through Trino.  There are also examples and usage instructions for interacting with the various services.
+While I recommend reading the entire README, you can skip to the Setup Instructions below if you know what you are doing and just want to get started.
 
-The docker-compose.yml also defines an ElasticSearch service and a MongoDB service (both of which are commented out).  If you wish to use ElasticSearch and/or MongoDB, uncomment the relevant lines in the docker-compose.yml (including their volume definitions at the bottom of the docker-compose.yml), and modify the relevant filenames in trino/catalog to remove ".template" (e.g. elasticsearch.properties.template -> elasticsearch.properties).  Trino will read any files in the trino/catalog folder that ends with ".properties".
+This project contains all configuration files needed to set up am entirely open-source, cloud-native, distributed, containerized, data-lakehouse analytics environment. The services used in this project were specifically selected for functionality and compatibility with one another. The combination of object storage (Minio), an open data-lakehouse data storage format (Delta Lake), support for multiple query engines (e.g. Trino, Spark, etc...), and additional metadata layer services/capabilities (e.g. data-catalogging, metadata management, etc...) are what make this a "data lakehouse" architecture.
+
+The project is designed to be modular and allow you to spin up the specific services that you are interested in learning or building on top of. It also contains examples to help you get started with common tasks like loading and processing data, orchestrating pipelines, tracking data qualilty, using various services APIs, creating dashboards, and catalogging data assets.
+
+The services included in this project are listed below. Some of the services have initialization scripts, configuration files, data, or other assets that the containers need access to upon startup. These files are stored in folders with names that correspond to the service that uses them. There is also a "data" folder that contains sample data used by some of the examples provided in this project.
+
+### Base Services
+The docker-compose.yml defines the following services (and their supporting services, e.g. init containers):
+- Jupyter Lab - Python notebook editor and interactive python environment.
+- Postgres Database - Transactional application database used by various other services in the environment.
+- Minio - Object store and central storage for data lakehouse data. Drop-in replacement for AWS S3.
+- Trino - Distributed query engine. Allows us to query Delta Lake data in files in S3 (Minio) with low latency as if it were a SQL database. Suitable for serving real-time analytics use-cases.
+- Hive Metastore Service - (NOT HIVE) The metastore service that Trino uses to manage metadata for Delta Lake tables.
+- Redis - Cache and message broker used by various other services in the environment.
+
+### Auxiliary Services
+The following services are each defined in their own .yml files, with filenames corresponding to the service defined within them.
+- Airflow (docker-compose-airflow.yml) - Orchestration of data pipelines (or anything else you might want to orchestrate).
+- Spark (docker-compose-spark.yml) - Distibuted data processing and query engine.
+- Superset (docker-compose-superset.yml) - Dashboarding and reporting.
+- Datahub (docker-compose-datahub.yml) - Data cataloging (including datasets, dashboards, machine-learning models, and more)
+
 
 ## Pre-Requisites
 - Working installations of Docker and docker-compose (if you do not have either of these installed, Google the installation instructions, follow the official installation instructions for your operating system, and then return here to continue)
 - Experience with Docker & docker-compose (if you do not have experience with Docker or docker-compose, it would help to get some experience by following the official Docker quick-start guides; while not required, it will definitely be easier to understand this project if you understand Docker and docker-compose)
-- A high level understanding of Trino (or Presto), Hive Standalone Metastore, and S3 or Minio (if you don't know about any of these, spend a few minutes researching them and then return here to continue)
+- A basic understanding of (or willingness to learn) the services you want to use
+- The base services can comfortably be run on 2 vCPU and 8gb RAM, while all services combined can comfortably be run on 8 vCPU and 32gb RAM (I have not measured specific numbers, but can confirm from my own experience. Your mileage may vary depending on your circumstances.)
 
-## Setup
-- Run `docker-compose up -d` (This will bring up the containers, initalize the metastore postgres database, create a 'test' bucket with public permissions in Minio, and create Minio service account access-keys/secrets for Spark and Trino)
-- Once the containers have started, navigate to Jupyter Lab at http://localhost:8888. Run the included notebook to write some Delta Lake tables. This is also a great way to learn a bit about PySpark & Delta Lake. (All code should run as-is). This essentially simulates placing data in an S3 bucket (e.g. as the result of an ETL job)
-- Navigate to the Superset UI at http://localhost:8088 and log in with the username and password below (or in the docker-compose.yml). Connect Superset to Trino (and by extension the Delta Lake tables in Minio which Trino can read like SQL tables) by selecting Data > Databases > +Database > Select Trino as DB Type > Set SQLAlchemy URI = 'trino://trino@trino:8080/delta'; also make sure to expose the database in SQL Lab and check the boxes next to "Allow CREATE TABLE AS", "Allow CREATE VIEW AS", and "Allow DML" under the 'Advanced' options.
-- Navigate to SQL Lab in the Superset UI, select the new Trino database connection from the appropriate dropdown menu, and run the SQL commands listed below under the "Superset" section of this README. These commands show you how to read Delta Lake tables through Trino & Superset without having to specify the schema ahead of time!
+## Setup Instructions
+The project is separated into a set of base services, defined in the docker-compose.yml file, and auxiliary services, defined in the other docker-compose-*.yml files. You must run the base services as the auxiliary services have dependencies on some of those base services, and you can run any or all of the auxiliary services alongside the base services.
+
+### Steps
+- Decide which services you want to spin up. I recommend starting with the base services and using the notebooks in the Jupyter container to get comfortable.
+- Bring up the relevant services
+  - If you are just using the base services, run `docker compose up -d` (This will bring up the containers, initalize the metastore postgres database, create a 'test' bucket with public permissions in Minio, and create Minio service account access-keys/secrets for the other services)
+  - If you want to use auxiliary services, run `docker compose -f docker-compose.yml [-f docker-compose-<service>.yml] up -d`. For example, to use the base services, Superset, and Spark, you would run `docker compose -f docker-compose.yml -f docker-compose-spark.yml -f docker-compose-superset.yml up -d`. I **strongly** recommend aliasing your docker compose command if using any auxiliary services to make subsequent `docker compose` commands easier. For example, `alias cap-compose='docker compose -f docker-compose.yml -f docker-compose-spark.yml -f docker-compose-superset.yml'`. Now I could run `cap-compose logs -f` to get logs from all deployed services instead of having to type out all the filenames each time.
 
 ## Service Endpoints
+
+Once the services have started, the services can be accessed at the following endpoints.
 - Jupyter Lab - http://localhost:8888
 - Spark UI - http://localhost:8090
 - Minio UI - http://localhost:9090 (user: minio, password: minio123)
 - Trino UI - http://localhost:8080 (user: *any*)
 - Superset UI - http://localhost:8088 (user: admin, password: admin)
-- Datahub UI - http://localhost:9002
-- CloudBeaver UI - http://localhost:8978
 - Trino Shell - `docker-compose exec trino trino` (Use this to run SQL commands against data in Minio)
-*Any host ports can be changed in the docker-compose.yml*
+
+*Any host ports can be changed in the docker-compose.yml or the relevant .yml file for the relevant service*
 
 ***
 
@@ -34,6 +60,8 @@ The docker-compose.yml also defines an ElasticSearch service and a MongoDB servi
 
 ### Jupyter
 ##### DOCUMENTATION TODO #####
+
+Once the containers have started, navigate to Jupyter Lab at http://localhost:8888. Run the sample notebooks. This is a great way to learn a bit about PySpark & Delta Lake. (All code should run as-is).
 
 ### Spark/Spark-Worker
 ##### DOCUMENTATION TODO #####
@@ -86,9 +114,11 @@ If you are interested in seeing the contents of the Hive Metastore, you can use 
 ***
 
 ### Superset
+Consider running the Pyspark notebook in the Jupyter service or the pipelines in the Airflow service to load data before using Superset.
+
 Apache Superset is arguably one of the best BI tools available, ignoring the fact that it is completely free and open-source.  In this project, Superset serves as a front-end for Trino.  You can use its SQL Lab Editor to write and execute queries against any datasource registered in Trino, and you can use it to create visuals and dashboards.
 
-Superset is accessible at http://localhost:8088 (Username: admin, Password: admin) once you have gone through the setup steps.  To connect Superset to Trino using Superset's Trino connector, login to the Superset UI and add Trino as a Database (select "Data" > "Databases" > "+Database" > "Trino", the SQLALCHEMY URI should be "trino://trino@trino:8080/hive" - the hostname/URL "trino" is simply the docker service name of trino as defined in the docker-compose.yml).
+Navigate to the Superset UI at http://localhost:8088 and log in with the username and password below (or in the docker-compose.yml). Connect Superset to Trino (and by extension the Delta Lake tables in Minio which Trino can read like SQL tables) by selecting Data > Databases > +Database > Select Trino as DB Type > Set SQLAlchemy URI = 'trino://trino@trino:8080/delta'; also make sure to expose the database in SQL Lab and check the boxes next to "Allow CREATE TABLE AS", "Allow CREATE VIEW AS", and "Allow DML" under the 'Advanced' options.
 
 Once connected, Superset's SQL Lab Editor can be used as a frontend for the Trino query engine (which in turn can be used to query Delta Lake tables directly from Minio(S3)).
 
