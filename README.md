@@ -1,5 +1,7 @@
 # Container Analytics Platform
 
+### Note: This README is slightly out-of-date as changes to this repo are relatively frequent. Updates to README are in progress.
+
 This project contains all configuration files needed to set up a modern, distributed, containerized analytics environment, allowing you to query data where it lies (in this case, in a S3 object store, in ElasticSearch, and in MongoDB). The docker-compose.yml file defines the following services: a Postgres container (backend for Hive Metastore), a Hive Metastore Container, a Minio Container (which you can use as a drop-in replacement for AWS S3) for testing the Hive metastore on an Object Store, a Trino container for querying data out of S3(Minio) using the Hive Metastore, and the four services that make up Superset for dashboarding data through Trino.  There are also examples and usage instructions for interacting with the various services.
 
 The docker-compose.yml also defines an ElasticSearch service and a MongoDB service (both of which are commented out).  If you wish to use ElasticSearch and/or MongoDB, uncomment the relevant lines in the docker-compose.yml (including their volume definitions at the bottom of the docker-compose.yml), and modify the relevant filenames in trino/catalog to remove ".template" (e.g. elasticsearch.properties.template -> elasticsearch.properties).  Trino will read any files in the trino/catalog folder that ends with ".properties".
