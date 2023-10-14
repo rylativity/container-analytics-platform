@@ -7,3 +7,6 @@ pandas
 psycopg2
 deltalake
 trino
+great_expectations
+fsspec
+s3fs

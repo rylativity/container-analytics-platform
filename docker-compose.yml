@@ -4,10 +4,10 @@ services:
   jupyter:
     build: ./jupyter/
     environment:
-      - S3_ENDPOINT=http://minio:9000
+      - AWS_ENDPOINT_URL=http://minio:9000
       - S3_BUCKET=test
-      - S3_ACCESS_KEY=jupyteraccesskey
-      - S3_SECRET_KEY=jupytersupersecretkey
+      - AWS_ACCESS_KEY_ID=jupyteraccesskey
+      - AWS_SECRET_ACCESS_KEY=jupytersupersecretkey
     ports: 
       - 8888:8888
     volumes:
