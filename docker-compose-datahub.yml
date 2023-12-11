@@ -24,7 +24,7 @@ services:
     ports:
     - ${DATAHUB_MAPPED_KAFKA_BROKER_PORT:-9092}:9092
     volumes:
-    - broker:/var/lib/kafka/data/
+    - broker:/var/lib/kafka/
   datahub-actions:
     container_name: datahub-actions
     depends_on:
@@ -269,7 +269,7 @@ services:
     - zkdata:/var/lib/zookeeper
 version: '3.9'
 volumes:
-  broker: null
-  esdata: null
-  mysqldata: null
-  zkdata: null
+  broker: 
+  esdata: 
+  mysqldata: 
+  zkdata: 
