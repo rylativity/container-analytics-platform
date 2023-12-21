@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  mlflow:
+    # healthcheck:
+    #   interval: 1s
+    #   retries: 5
+    #   start_period: 60s
+    #   test: ...
+    #   timeout: 5s
+    build: ./mlflow_
+    ports:
+    - 5001:5000
