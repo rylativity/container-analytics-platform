@@ -3,7 +3,7 @@ from airflow.decorators import task, dag
 from airflow.providers.trino.operators.trino import TrinoOperator
 from datetime import datetime
 
-from datahub_provider.entities import Dataset as DatahubDataset
+# from datahub_provider.entities import Dataset as DatahubDataset
 from deltalake.writer import write_deltalake
 import pandas as pd
 
@@ -27,7 +27,7 @@ TRINO_TABLE = "appl_stock_delta_table"
 MINIO_BUCKET = "s3a://test/"
 
 airflow_dataset = AirflowDataset(f"{MINIO_BUCKET}{TRINO_TABLE}")
-datahub_dataset = DatahubDataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}")
+# datahub_dataset = DatahubDataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}")
 
 @dag(
     dag_id="create_and_register_delta_table",
@@ -69,7 +69,7 @@ def create_deltalake_table():
         """,
         handler=list,
         outlets = [
-            datahub_dataset,
+            # datahub_dataset,
             airflow_dataset
         ]
     )
@@ -102,10 +102,10 @@ def create_table_trino():
         SELECT * FROM {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}
         )""",
         handler=list,
-        inlets=[datahub_dataset],
-        outlets = [
-            DatahubDataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}_VERSION_2")
-        ]
+        # inlets=[datahub_dataset],
+        # outlets = [
+        #     DatahubDataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}_VERSION_2")
+        # ]
     )
 
 

@@ -1,8 +1,8 @@
-FROM apache/airflow:2.7.1-python3.9
+FROM apache/airflow:2.8.0-python3.9
 
 USER root 
 
-RUN apt-get update && apt-get install -y openjdk-11-jdk && rm -rf /var/lib/apt/lists
+RUN apt-get update && apt-get install -y openjdk-17-jdk && rm -rf /var/lib/apt/lists
 
 USER airflow
 
