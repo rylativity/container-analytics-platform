@@ -21,7 +21,7 @@ SILVER_TABLE_PATH = args["output_path"]
 # def write_deltalake_table():
 conf = pyspark.SparkConf()
 conf.setMaster("spark://spark:7077")
-conf.set("spark.jars.packages", 'org.apache.hadoop:hadoop-aws:3.3.3,io.delta:delta-core_2.12:2.1.0')
+conf.set("spark.jars.packages", 'org.apache.hadoop:hadoop-aws:3.3.4,io.delta:delta-spark_2.12:3.1.0')
 # conf.set('spark.hadoop.fs.s3a.aws.credentials.provider', 'org.apache.hadoop.fs.s3a.AnonymousAWSCredentialsProvider')
 conf.set('spark.hadoop.fs.s3a.endpoint', AWS_ENDPOINT_URL)
 conf.set('spark.hadoop.fs.s3a.access.key', AWS_ACCESS_KEY_ID)
