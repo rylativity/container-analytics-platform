@@ -1,5 +1,3 @@
-version: '3.9'
-
 x-superset-image: &superset-image apache/superset:2.0.0
 x-superset-depends-on: &superset-depends-on
   - postgres
