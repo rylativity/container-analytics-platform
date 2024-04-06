@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
-until curl -s -f -o /dev/null "http://minio:9000/minio/health/ready"
+until mc alias set myminio http://minio:9000 minio minio123; mc ready myminio
 do
   sleep 5
 done
