@@ -1,10 +1,11 @@
-apache-airflow[celery]==2.8.4 --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.8.4/constraints-3.10.txt"
+apache-airflow[celery]==2.7.3 --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.7.3/constraints-3.9.txt"
 apache-airflow-providers-trino[common.sql]
 pyspark==3.5.1
 apache-airflow-providers-apache-spark
 deltalake
-# acryl-datahub-airflow-plugin[plugin-v2]
-# acryl-datahub[airflow,great-expectations]
+acryl-datahub-airflow-plugin[plugin-v2]
+openlineage-python>=1.4.1
+# acryl-datahub[airflow]
 # airflow-provider-great-expectations
 # dbt-dremio
 # dbt-trino

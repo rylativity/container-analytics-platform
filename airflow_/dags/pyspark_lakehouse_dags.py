@@ -2,9 +2,11 @@ from datetime import datetime
 import logging
 import os
 
-from airflow import Dataset
+from airflow import Dataset as AirflowDataset
 from airflow.decorators import dag
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
+
+from datahub_airflow_plugin.entities import Dataset as DatahubDataset, Urn
 
 
 log = logging.getLogger(__name__)
@@ -43,13 +45,19 @@ def load_bronze_table():
         packages=spark_packages,
         # env_vars={},
         application_args=[f"--input-path={SOURCE_CSV_DATA_PATH}", f"--output-path={BRONZE_TABLE_PATH}"],
-        inlets=[Dataset(SOURCE_CSV_DATA_PATH)],
-        outlets=[Dataset(BRONZE_TABLE_PATH)]
+        inlets=[
+            # AirflowDataset(SOURCE_CSV_DATA_PATH), 
+            DatahubDataset("s3", SOURCE_CSV_DATA_PATH)
+            ],
+        outlets=[
+            # AirflowDataset(BRONZE_TABLE_PATH), 
+            DatahubDataset("s3", BRONZE_TABLE_PATH)
+            ]
     )
 load_bronze_table()
 
 @dag(
-    schedule=[Dataset(BRONZE_TABLE_PATH)],
+    schedule=[AirflowDataset(BRONZE_TABLE_PATH)],
     start_date=datetime(2021, 1, 1),
     catchup=False,
     tags=["silver"],
@@ -71,12 +79,12 @@ def clean_and_load_silver_table():
         packages=spark_packages,
         env_vars={},
         application_args=[f"--input-path={BRONZE_TABLE_PATH}", f"--output-path={SILVER_TABLE_PATH}"],
-        outlets=[Dataset(SILVER_TABLE_PATH)]
+        outlets=[AirflowDataset(SILVER_TABLE_PATH)]
     )
 clean_and_load_silver_table()
 
 @dag(
-    schedule=[Dataset(SILVER_TABLE_PATH)],
+    schedule=[AirflowDataset(SILVER_TABLE_PATH)],
     start_date=datetime(2021, 1, 1),
     catchup=False,
     tags=["silver"],
@@ -98,6 +106,6 @@ def process_and_load_gold_table():
         packages=spark_packages,
         # env_vars={},
         application_args=[f"--input-path={SILVER_TABLE_PATH}", f"--output-path={GOLD_TABLE_PATH}"],
-        outlets=[Dataset(GOLD_TABLE_PATH)]
+        outlets=[AirflowDataset(GOLD_TABLE_PATH)]
     )
 process_and_load_gold_table()
