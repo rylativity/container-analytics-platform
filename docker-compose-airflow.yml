@@ -64,7 +64,6 @@ x-airflow-common:
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
-    DATAHUB_AIRFLOW_PLUGIN_USE_V1_PLUGIN: 'true'
     # yamllint disable rule:line-length
     # Use simple http server on scheduler for health checks
     # See https://airflow.apache.org/docs/apache-airflow/stable/administration-and-deployment/logging-monitoring/check-health.html#scheduler-health-check-server
@@ -78,7 +77,7 @@ x-airflow-common:
     - ./airflow_/logs:/opt/airflow/logs
     - ./airflow_/plugins:/opt/airflow/plugins
     - ./data:/data
-    # - ./airflow_/airflow.cfg:/opt/airflow/airflow.cfg
+    - ./airflow_/airflow.cfg:/opt/airflow/airflow.cfg
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on

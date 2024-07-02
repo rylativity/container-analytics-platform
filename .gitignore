@@ -5,3 +5,5 @@ venv/
 *.parq
 *.parquet
 logs/
+
+docker-volume/
