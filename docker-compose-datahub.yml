@@ -160,8 +160,8 @@ services:
       timeout: 5s
     hostname: elasticsearch
     image: ${DATAHUB_SEARCH_IMAGE:-elasticsearch}:${DATAHUB_SEARCH_TAG:-7.10.1}
-    ports:
-    - ${DATAHUB_MAPPED_ELASTIC_PORT:-9200}:9200
+    # ports:
+    # - ${DATAHUB_MAPPED_ELASTIC_PORT:-9200}:9200
     volumes:
     - esdata:/usr/share/elasticsearch/data
   elasticsearch-setup:
