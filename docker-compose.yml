@@ -56,13 +56,15 @@ services:
     ports:
       - 8880:8080
   keycloak:
-    command: ["start-dev"]
-    image: quay.io/keycloak/keycloak:25.0.1
+    command: ["start-dev", "--import-realm"]
+    build: ./keycloak
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
     ports:
       - 8123:8080
+    volumes:
+      - keycloak-data:/opt/keycloak/data
   
   # dremio:
   #   image: dremio/dremio-oss
@@ -158,6 +160,7 @@ volumes:
   redis-data:
   dremio-data:
   cloudbeaver-data:
+  keycloak-data:
   # elasticsearch_data:
   # mongo_data: 
 
