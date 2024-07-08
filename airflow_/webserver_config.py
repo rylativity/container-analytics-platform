@@ -110,6 +110,7 @@ OAUTH_PROVIDERS = [
         }
     }
 ]
+# https://flask-appbuilder.readthedocs.io/en/latest/security.html
 
 # When using LDAP Auth, setup the ldap server
 # AUTH_LDAP_SERVER = "ldap://ldapserver.new"

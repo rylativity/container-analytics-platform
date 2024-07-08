@@ -5,7 +5,7 @@ set -euxo pipefail;
    client_id=minio \
    client_secret=secretvalue \
    config_url="http://keycloak:8080/realms/analytics/.well-known/openid-configuration" \
-   display_name="Minio" \
+   display_name="Keycloak SSO" \
    scopes="openid,email,policy" \
    redirect_uri_dynamic="on"
 
