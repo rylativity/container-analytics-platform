@@ -78,6 +78,7 @@ x-airflow-common:
     - ./airflow_/plugins:/opt/airflow/plugins
     - ./data:/data
     - ./airflow_/airflow.cfg:/opt/airflow/airflow.cfg
+    - ./airflow_/webserver_config.py:/opt/airflow/webserver_config.py
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
