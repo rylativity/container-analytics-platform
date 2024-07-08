@@ -24,7 +24,7 @@ import os
 from flask_appbuilder.const import AUTH_DB
 
 # from airflow.www.fab_security.manager import AUTH_LDAP
-# from airflow.www.fab_security.manager import AUTH_OAUTH
+from airflow.www.fab_security.manager import AUTH_OAUTH
 # from airflow.www.fab_security.manager import AUTH_OID
 # from airflow.www.fab_security.manager import AUTH_REMOTE_USER
 
@@ -48,7 +48,8 @@ WTF_CSRF_TIME_LIMIT = None
 # AUTH_LDAP : Is for LDAP
 # AUTH_REMOTE_USER : Is for using REMOTE_USER from web server
 # AUTH_OAUTH : Is for OAuth
-AUTH_TYPE = AUTH_DB
+# AUTH_TYPE = AUTH_DB
+AUTH_TYPE = AUTH_OAUTH
 
 # Uncomment to setup Full admin role name
 # AUTH_ROLE_ADMIN = 'Admin'
@@ -57,7 +58,7 @@ AUTH_TYPE = AUTH_DB
 # AUTH_ROLE_PUBLIC = 'Viewer'
 
 # Will allow user self registration
-# AUTH_USER_REGISTRATION = True
+AUTH_USER_REGISTRATION = True
 
 # The recaptcha it's automatically enabled for user self registration is active and the keys are necessary
 # RECAPTCHA_PRIVATE_KEY = PRIVATE_KEY
@@ -71,7 +72,7 @@ AUTH_TYPE = AUTH_DB
 # MAIL_DEFAULT_SENDER = 'sender@gmail.com'
 
 # The default user self registration role
-# AUTH_USER_REGISTRATION_ROLE = "Public"
+AUTH_USER_REGISTRATION_ROLE = "Public"
 
 # When using OAuth Auth, uncomment to setup provider(s) info
 # Google OAuth example:
@@ -91,6 +92,24 @@ AUTH_TYPE = AUTH_DB
 #             'client_secret': GOOGLE_SECRET_KEY,
 #         }
 # }]
+OAUTH_PROVIDERS = [
+    {
+        "name": "keycloak",
+        "icon": "fa-key",
+        "token_key": "access_token",
+        "remote_app": {
+            "client_id": "airflow",
+            "client_secret": "2rBHDPIwVby6E3vJwqPWJl4VbgtE3HR4",
+            "api_base_url": "http://localhost:8123/realms/analytics/protocol/openid-connect",
+            "client_kwargs": {
+                "scope": "email profile"
+            },
+            "access_token_url": "http://localhost:8123/realms/analytics/protocol/openid-connect/token",
+            "authorize_url": "http://localhost:8123/realms/analytics/protocol/openid-connect/auth",
+            "request_token_url": None,
+        }
+    }
+]
 
 # When using LDAP Auth, setup the ldap server
 # AUTH_LDAP_SERVER = "ldap://ldapserver.new"
