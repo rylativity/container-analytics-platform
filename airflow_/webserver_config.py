@@ -107,7 +107,8 @@ PROVIDER_NAME = 'keycloak'
 OIDC_ISSUER = 'http://localhost:8123/realms/analytics'
 OIDC_ISSUER_BACKEND_URL = 'http://keycloak:8080/realms/analytics'
 OIDC_BASE_URL = f"{OIDC_ISSUER}/protocol/openid-connect"
-OIDC_TOKEN_URL = f"{OIDC_BASE_URL}/token"
+OIDC_TOKEN_URL = f"{OIDC_ISSUER_BACKEND_URL}/protocol/openid-connect/token"
+JWKS_URI = f"{OIDC_ISSUER_BACKEND_URL}/protocol/openid-connect/certs"
 OIDC_AUTH_URL = f"{OIDC_BASE_URL}/auth"
 OAUTH_PROVIDERS = [
     {
@@ -124,6 +125,7 @@ OAUTH_PROVIDERS = [
             "access_token_url": OIDC_TOKEN_URL,
             "authorize_url": OIDC_AUTH_URL,
             "request_token_url": None,
+            "jwks_uri":JWKS_URI
         }
     }
 ]
