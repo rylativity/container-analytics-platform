@@ -103,6 +103,7 @@ AUTH_USER_REGISTRATION_ROLE = "Public"
 #         }
 # }]
 
+CLIENT_ID='airflow'
 PROVIDER_NAME = 'keycloak'
 OIDC_ISSUER = 'http://localhost:8123/realms/analytics'
 OIDC_ISSUER_BACKEND_URL = 'http://keycloak:8080/realms/analytics'
@@ -155,12 +156,12 @@ class CustomSecurityManager(AirflowSecurityManager):
     def oauth_user_info(self, provider, response):
         if provider == PROVIDER_NAME:
             token = response["access_token"]
-            me = jwt.decode(token, public_key, algorithms=['HS256', 'RS256'])
+            me = jwt.decode(token, public_key, algorithms=['HS256', 'RS256'], audience=CLIENT_ID)
             # sample of resource_access
             # {
             #   "resource_access": { "airflow": { "roles": ["airflow_admin"] }}
             # }
-            groups = me["realm_access"]["roles"] # unsafe
+            groups = me["resource_access"]["airflow"]["roles"] # unsafe
             if len(groups) < 1:
                 groups = ["airflow_public"]
             else:
