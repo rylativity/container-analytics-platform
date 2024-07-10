@@ -18,16 +18,26 @@
 """Default configuration for the Airflow webserver."""
 
 from __future__ import annotations
-
 import os
+import logging
+import jwt
+import requests
+from base64 import b64decode
+from cryptography.hazmat.primitives import serialization
+from tokenize import Exponent
+from airflow.www.security import AirflowSecurityManager
+from flask_appbuilder import expose
+from flask_appbuilder.security.views import AuthOAuthView
 
-from flask_appbuilder.const import AUTH_DB
 
 # from airflow.www.fab_security.manager import AUTH_LDAP
 from airflow.www.fab_security.manager import AUTH_OAUTH
 # from airflow.www.fab_security.manager import AUTH_OID
 # from airflow.www.fab_security.manager import AUTH_REMOTE_USER
 
+log = logging.getLogger(__name__)
+
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -92,25 +102,79 @@ AUTH_USER_REGISTRATION_ROLE = "Public"
 #             'client_secret': GOOGLE_SECRET_KEY,
 #         }
 # }]
+
+PROVIDER_NAME = 'keycloak'
+OIDC_ISSUER = 'http://localhost:8123/realms/analytics'
+OIDC_ISSUER_BACKEND_URL = 'http://keycloak:8080/realms/analytics'
+OIDC_BASE_URL = f"{OIDC_ISSUER}/protocol/openid-connect"
+OIDC_TOKEN_URL = f"{OIDC_BASE_URL}/token"
+OIDC_AUTH_URL = f"{OIDC_BASE_URL}/auth"
 OAUTH_PROVIDERS = [
     {
-        "name": "keycloak",
+        "name": PROVIDER_NAME,
         "icon": "fa-key",
         "token_key": "access_token",
         "remote_app": {
             "client_id": "airflow",
             "client_secret": "2rBHDPIwVby6E3vJwqPWJl4VbgtE3HR4",
-            "api_base_url": "http://localhost:8123/realms/analytics/protocol/openid-connect",
+            "api_base_url": OIDC_BASE_URL,
             "client_kwargs": {
-                "scope": "email profile"
+                "scope": "openid email profile"
             },
-            "access_token_url": "http://localhost:8123/realms/analytics/protocol/openid-connect/token",
-            "authorize_url": "http://localhost:8123/realms/analytics/protocol/openid-connect/auth",
+            "access_token_url": OIDC_TOKEN_URL,
+            "authorize_url": OIDC_AUTH_URL,
             "request_token_url": None,
         }
     }
 ]
 # https://flask-appbuilder.readthedocs.io/en/latest/security.html
+
+AUTH_ROLES_SYNC_AT_LOGIN = True
+AUTH_ROLES_MAPPING = {
+  "airflow_admin": ["Admin"],
+  "airflow_op": ["Op"],
+  "airflow_user": ["User"],
+  "airflow_viewer": ["Viewer"],
+  "airflow_public": ["Public"],
+}
+
+req = requests.get(OIDC_ISSUER_BACKEND_URL)
+key_der_base64 = req.json()["public_key"]
+key_der = b64decode(key_der_base64.encode())
+public_key = serialization.load_der_public_key(key_der)
+class CustomAuthRemoteUserView(AuthOAuthView):
+    @expose("/logout/")
+    def logout(self):
+        """Delete access token before logging out."""
+        return super().logout()
+class CustomSecurityManager(AirflowSecurityManager):
+    authoauthview = CustomAuthRemoteUserView
+  
+    def oauth_user_info(self, provider, response):
+        if provider == PROVIDER_NAME:
+            token = response["access_token"]
+            me = jwt.decode(token, public_key, algorithms=['HS256', 'RS256'])
+            # sample of resource_access
+            # {
+            #   "resource_access": { "airflow": { "roles": ["airflow_admin"] }}
+            # }
+            groups = me["realm_access"]["roles"] # unsafe
+            if len(groups) < 1:
+                groups = ["airflow_public"]
+            else:
+                groups = [str for str in groups if "airflow" in str]
+            userinfo = {
+                "username": me.get("preferred_username"),
+                "email": me.get("email"),
+                "first_name": me.get("given_name"),
+                "last_name": me.get("family_name"),
+                "role_keys": groups,
+            }
+            return userinfo
+        else:
+            return {}
+SECURITY_MANAGER_CLASS = CustomSecurityManager
+
 
 # When using LDAP Auth, setup the ldap server
 # AUTH_LDAP_SERVER = "ldap://ldapserver.new"
