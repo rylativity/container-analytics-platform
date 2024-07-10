@@ -156,6 +156,7 @@ class CustomSecurityManager(AirflowSecurityManager):
     def oauth_user_info(self, provider, response):
         if provider == PROVIDER_NAME:
             token = response["access_token"]
+            log.info(f"TOKEN:\n{token}")
             me = jwt.decode(token, public_key, algorithms=['HS256', 'RS256'], audience=CLIENT_ID)
             # sample of resource_access
             # {
