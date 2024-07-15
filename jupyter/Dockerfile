@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y openjdk-11-jdk
 
 COPY ./requirements.txt .
 
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt --upgrade
 
 WORKDIR /notebooks
 

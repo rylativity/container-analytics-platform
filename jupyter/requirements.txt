@@ -11,3 +11,4 @@ great_expectations
 fsspec
 s3fs
 boto3
+# acryl-datahub[great-expectations]
