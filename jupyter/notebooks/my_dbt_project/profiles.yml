@@ -1,0 +1,12 @@
+trino:
+  target: dev
+  outputs:
+    dev:
+      type: trino
+      user: trino
+      # password: trino
+      host: http://trino
+      database: delta
+      schema: my_schema
+      port: 8080
+      threads: 1
