@@ -5,6 +5,7 @@ import os
 from airflow import Dataset as AirflowDataset
 from airflow.decorators import dag
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
+from datahub_airflow_plugin.entities import Dataset as DatahubDataset, Urn
 
 log = logging.getLogger(__name__)
 
@@ -44,11 +45,11 @@ def load_bronze_table():
         application_args=[f"--input-path={SOURCE_CSV_DATA_PATH}", f"--output-path={BRONZE_TABLE_PATH}"],
         inlets=[
             AirflowDataset(SOURCE_CSV_DATA_PATH), 
-            SOURCE_CSV_DATA_PATH
+            DatahubDataset('s3', SOURCE_CSV_DATA_PATH)
             ],
         outlets=[
             AirflowDataset(BRONZE_TABLE_PATH), 
-            BRONZE_TABLE_PATH
+            DatahubDataset('s3',BRONZE_TABLE_PATH)
             ]
         # inlets={
         #     "tables":[SOURCE_CSV_DATA_PATH]
