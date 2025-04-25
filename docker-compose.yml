@@ -20,7 +20,7 @@ services:
     volumes:
       - postgres-db:/var/lib/postgresql/data
       - ./superset/init_supersetdb.sql:/docker-entrypoint-initdb.d/init_supersetdb.sql
-      - ./airflow_/init_airflowdb.sql:/docker-entrypoint-initdb.d/init_airflowdb.sql
+      - ./airflow/init_airflowdb.sql:/docker-entrypoint-initdb.d/init_airflowdb.sql
       - ./metastore/init_metastoredb.sql:/docker-entrypoint-initdb.d/init_metastoredb.sql
     healthcheck:
       test: ["CMD", "pg_isready","-U", "postgres"]

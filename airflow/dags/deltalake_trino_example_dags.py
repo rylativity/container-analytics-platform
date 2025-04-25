@@ -1,6 +1,6 @@
 from airflow import Dataset as AirflowDataset
 from airflow.decorators import task, dag
-from airflow.providers.trino.operators.trino import TrinoOperator
+from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from datetime import datetime
 
 # from datahub_provider.entities import Dataset as DatahubDataset
@@ -40,7 +40,7 @@ def create_deltalake_table():
 
     ## Create a Delta Lake Table from CSV Using The Delta-RS Library
 
-    trino_drop_table = TrinoOperator(
+    trino_drop_table = SQLExecuteQueryOperator(
         task_id="trino_drop_table",
         sql=f"""DROP TABLE IF EXISTS {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE} 
         """,
@@ -55,14 +55,14 @@ def create_deltalake_table():
 
 
     ## Create the Trino Schema to Hold our Delta Tables (Using Minio/S3 as the storage location)
-    trino_create_schema = TrinoOperator(
+    trino_create_schema = SQLExecuteQueryOperator(
         task_id="trino_create_schema",
         sql=f"CREATE SCHEMA IF NOT EXISTS {TRINO_DB}.{TRINO_SCHEMA} WITH (location='{MINIO_BUCKET}')",
         handler=list
     )
 
     ## Register the Delta Lake Table Created In The First Task to the Schema Created in the Second Task
-    trino_register_delta_table = TrinoOperator(
+    trino_register_delta_table = SQLExecuteQueryOperator(
         task_id="trino_register_delta_table",
         sql=f"""
         CALL {TRINO_DB}.system.register_table(schema_name => '{TRINO_SCHEMA}', table_name => '{TRINO_TABLE}', table_location => '{MINIO_BUCKET}{TRINO_TABLE}')
@@ -88,7 +88,7 @@ def create_table_trino():
     ## This task will fail unless you create the source delta.my_schema.appl_stock_delta_table. 
     # You can create this table by going to http://localhost:8888 and running the `pyspark_delta_example.ipynb` notebook
 
-    trino_drop_table = TrinoOperator(
+    trino_drop_table = SQLExecuteQueryOperator(
         task_id="trino_drop_table",
         sql=f"""DROP TABLE IF EXISTS {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}_VERSION_2
         """,
@@ -96,7 +96,7 @@ def create_table_trino():
 
     )
 
-    trino_create_table = TrinoOperator(
+    trino_create_table = SQLExecuteQueryOperator(
         task_id="trino_create_table",
         sql=f"""CREATE TABLE IF NOT EXISTS {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}_VERSION_2 AS(
         SELECT * FROM {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}
