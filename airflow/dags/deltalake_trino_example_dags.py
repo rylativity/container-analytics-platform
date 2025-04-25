@@ -45,7 +45,7 @@ def create_deltalake_table():
         sql=f"""DROP TABLE IF EXISTS {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE} 
         """,
         handler=list,
-
+        conn_id="trino_default"
     )
 
     @task()
@@ -58,7 +58,8 @@ def create_deltalake_table():
     trino_create_schema = SQLExecuteQueryOperator(
         task_id="trino_create_schema",
         sql=f"CREATE SCHEMA IF NOT EXISTS {TRINO_DB}.{TRINO_SCHEMA} WITH (location='{MINIO_BUCKET}')",
-        handler=list
+        handler=list,
+        conn_id="trino_default"
     )
 
     ## Register the Delta Lake Table Created In The First Task to the Schema Created in the Second Task
@@ -71,7 +72,8 @@ def create_deltalake_table():
         outlets = [
             # datahub_dataset,
             airflow_dataset
-        ]
+        ],
+        conn_id="trino_default"
     )
 
     trino_drop_table >> deltalake_create_table() >> trino_create_schema >> trino_register_delta_table
@@ -93,7 +95,15 @@ def create_table_trino():
         sql=f"""DROP TABLE IF EXISTS {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}_VERSION_2
         """,
         handler=list,
+        conn_id="trino_default"
+    )
 
+    ## Create the Trino Schema to Hold our Delta Tables (Using Minio/S3 as the storage location)
+    trino_create_schema = SQLExecuteQueryOperator(
+        task_id="trino_create_schema",
+        sql=f"CREATE SCHEMA IF NOT EXISTS {TRINO_DB}.{TRINO_SCHEMA} WITH (location='{MINIO_BUCKET}')",
+        handler=list,
+        conn_id="trino_default"
     )
 
     trino_create_table = SQLExecuteQueryOperator(
@@ -102,11 +112,14 @@ def create_table_trino():
         SELECT * FROM {TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}
         )""",
         handler=list,
+        conn_id="trino_default"
         # inlets=[datahub_dataset],
         # outlets = [
         #     DatahubDataset("trino", f"{TRINO_DB}.{TRINO_SCHEMA}.{TRINO_TABLE}_VERSION_2")
         # ]
     )
+
+    trino_drop_table >> trino_create_schema >> trino_create_table
 
 
 create_deltalake_table()
