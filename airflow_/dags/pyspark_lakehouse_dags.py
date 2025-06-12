@@ -5,8 +5,7 @@ import os
 from airflow import Dataset as AirflowDataset
 from airflow.decorators import dag
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
-from datahub_airflow_plugin.entities import Dataset as DatahubDataset, Urn
-
+from datahub_provider.entities import Dataset as DatahubDataset, Urn
 log = logging.getLogger(__name__)
 
 SOURCE_CSV_DATA_PATH = f"s3a://test/transaction_data.csv"

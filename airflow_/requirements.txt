@@ -1,4 +1,4 @@
-apache-airflow[celery]==3.0.0 --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-3.0.0/constraints-3.12.txt"
+apache-airflow[celery]==2.11.0 --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.11.0/constraints-3.12.txt"
 apache-airflow-providers-trino[common.sql]
 # trino
 pyspark==3.5.5
